@@ -262,7 +262,7 @@ int main()
 
 
 	// Initialize baryon diffusion current
-	double Vx = 0.5 * nBeq;
+	double Vx = 0.0 * nBeq;
 	double Vy = 0.0 * nBeq;
 	double Vz = 0.0 * nBeq;
 
@@ -387,7 +387,7 @@ int main()
 	double modTty = 0.0;
 	double modTtz = 0.0;
 
-	double fact_modN = pow(Tp,3) / (8.0*M_PI*M_PI);
+	double fact_modN = detA * pow(Tp,3) / (8.0*M_PI*M_PI);
 
 
 
@@ -409,6 +409,7 @@ int main()
 
 		// linearized particle density
 		n_linear = neq + bn_J10*dalphaB + J20*dT/(T*T) + J21*Pi/(betaPi*T);
+		//n_linear = neq;
 
 		// modified particle density
 		//n_prime = (double)degeneracy[k] * fact_N * Gauss1D(neq_integrand, pbar_rootN, pbar_weightN, gla_pts, mass[k]/Tp, alphaBp, baryon[k], sign[k]);
@@ -465,6 +466,10 @@ int main()
 
 	double bulk_in = (Txx + Tyy + Tzz)/3.0 - Peq;
 	double modbulk = (modTxx + modTyy + modTzz)/3.0 - Peq;
+
+
+	//modVx += bn2_J11 * V_alpha[0];
+	//modTtx += nBeq * T * V_alpha[0];  // add truncated V_alpha correction
 
 
 	// print input/output results for comparison

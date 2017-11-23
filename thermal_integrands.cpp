@@ -179,8 +179,8 @@ double modE_integrand(double xphi, double costheta, double pbar, double ** A, do
 		{
 			p_unit[i] += A[i][k]*unit_vec[k];
 		}
-		p_unit[i] += (bn*V_alpha[i] - V_q[i]*Ebar)/pbar;
-		//p_unit[i] -= V_q[i]*Ebar/pbar;
+		//p_unit[i] += (bn*V_alpha[i] - V_q[i]*Ebar)/pbar;
+		p_unit[i] -= V_q[i]*Ebar/pbar;
 	}
 
 	double energy_unit = (mbar*mbar) / (pbar*pbar);
@@ -191,6 +191,9 @@ double modE_integrand(double xphi, double costheta, double pbar, double ** A, do
 
 	double dalphaX = 0.0;
 	//for(int i = 0; i < n; i++) dalphaX += unit_vec[i]*V_alpha[i]*pbar/Ebar;
+	//for(int i = 0; i < n; i++) dalphaX += p_unit[i]*V_alpha[i] / energy_unit;
+	//for(int i = 0; i < n; i++) dalphaX += p_unit[i]*V_alpha[i] * pbar/ Ebar;
+	for(int i = 0; i < n; i++) dalphaX += unit_vec[i]*V_alpha[i]/energy_unit;
 
 	// gauss laguerre (a = 2)
 	return detJ * pbar * energy_unit * exp(pbar) / (exp(Ebar-bn*(alphaB+dalphaX)) + a);
@@ -216,8 +219,8 @@ double modTxx_integrand(double xphi, double costheta, double pbar, double ** A, 
 		{
 			p_unit[i] += A[i][k]*unit_vec[k];
 		}
-		p_unit[i] += (bn*V_alpha[i] - V_q[i]*Ebar)/pbar;
-		//p_unit[i] -= V_q[i]*Ebar/pbar;
+		//p_unit[i] += (bn*V_alpha[i] - V_q[i]*Ebar)/pbar;
+		p_unit[i] -= V_q[i]*Ebar/pbar;
 	}
 
 	//p_unit[0] = (pbar*unit_vec[0]+bn*V_alpha[0] - V_q[0]*sqrt((mbar*mbar + pbar*pbar*(1.0 - unit_vec[0]*unit_vec[0]))*(1.0 - V_q[0]*V_q[0]) + (pbar*unit_vec[0]+bn*V_alpha[0])*(pbar*unit_vec[0]+bn*V_alpha[0])))/(pbar*(1.0 - V_q[0]*V_q[0]));
@@ -236,13 +239,14 @@ double modTxx_integrand(double xphi, double costheta, double pbar, double ** A, 
 	//for(int i = 0; i < n; i++) dalphaX += unit_vec[i]*V_alpha[i]*pbar/Ebar;
 	//for(int i = 0; i < n; i++) dalphaX += p_unit[i]*V_alpha[i] / energy_unit;  // this could affect renormalization of particle density
 	//for(int i = 0; i < n; i++) dalphaX += p_unit[i]*V_alpha[i] * pbar/ Ebar;
+	for(int i = 0; i < n; i++) dalphaX += unit_vec[i]*V_alpha[i]/energy_unit;
 
 	// gauss laguerre (a = 2)
 	return detJ * pbar * px_unit * px_unit / energy_unit * exp(pbar) / (exp(Ebar-bn*(alphaB+dalphaX)) + a);
 }
 
 
-double modTyy_integrand(double xphi, double costheta, double pbar, double **A, double * V_p, double * V_a, int n, double mbar, double alphaB, int baryon, int sign)
+double modTyy_integrand(double xphi, double costheta, double pbar, double **A, double * V_q, double * V_alpha, int n, double mbar, double alphaB, int baryon, int sign)
 {
 	double Ebar = sqrt(pbar*pbar + mbar*mbar);
 	double a = (double)sign;
@@ -260,8 +264,8 @@ double modTyy_integrand(double xphi, double costheta, double pbar, double **A, d
 		{
 			p_unit[i] += A[i][k]*unit_vec[k];
 		}
-		p_unit[i] += (bn*V_a[i] - V_p[i]*Ebar)/pbar;
-		//p_unit[i] -= V_q[i]*Ebar/pbar;
+		//p_unit[i] += (bn*V_a[i] - V_p[i]*Ebar)/pbar;
+		p_unit[i] -= V_q[i]*Ebar/pbar;
 	}
 	double energy_unit = (mbar*mbar) / (pbar*pbar);
 	for(int i = 0; i < n; i++) energy_unit += p_unit[i] * p_unit[i];
@@ -269,10 +273,13 @@ double modTyy_integrand(double xphi, double costheta, double pbar, double **A, d
 
 	double py_unit = p_unit[1];
 
-	double detJ = 1.0 - pbar * unit_vec[0] * V_p[0] / Ebar;  // this is very makeshift
+	double detJ = 1.0 - pbar * unit_vec[0] * V_q[0] / Ebar;  // this is very makeshift
 
 	double dalphaX = 0.0;
-	//for(int i = 0; i < n; i++) dalphaX += unit_vec[i]*V_a[i]*pbar/Ebar;
+	//for(int i = 0; i < n; i++) dalphaX += unit_vec[i]*V_alpha[i]*pbar/Ebar;
+	//for(int i = 0; i < n; i++) dalphaX += p_unit[i]*V_alpha[i] / energy_unit;
+	//for(int i = 0; i < n; i++) dalphaX += p_unit[i]*V_alpha[i] * pbar/ Ebar;
+	for(int i = 0; i < n; i++) dalphaX += unit_vec[i]*V_alpha[i]/energy_unit;
 
 	// gauss laguerre (a = 2)
 	return detJ * pbar * py_unit * py_unit / energy_unit * exp(pbar) / (exp(Ebar-bn*(alphaB+dalphaX)) + a);
@@ -297,8 +304,8 @@ double modTzz_integrand(double xphi, double costheta, double pbar, double **A, d
 		{
 			p_unit[i] += A[i][k]*unit_vec[k];
 		}
-		p_unit[i] += (bn*V_alpha[i] - V_q[i]*Ebar)/pbar;
-		//p_unit[i] -= V_q[i]*Ebar/pbar;
+		//p_unit[i] += (bn*V_alpha[i] - V_q[i]*Ebar)/pbar;
+		p_unit[i] -= V_q[i]*Ebar/pbar;
 	}
 	double energy_unit = (mbar*mbar) / (pbar*pbar);
 	for(int i = 0; i < n; i++) energy_unit += p_unit[i] * p_unit[i];
@@ -310,6 +317,9 @@ double modTzz_integrand(double xphi, double costheta, double pbar, double **A, d
 
 	double dalphaX = 0.0;
 	//for(int i = 0; i < n; i++) dalphaX += unit_vec[i]*V_alpha[i]*pbar/Ebar;
+	//for(int i = 0; i < n; i++) dalphaX += p_unit[i]*V_alpha[i] / energy_unit;
+	//for(int i = 0; i < n; i++) dalphaX += p_unit[i]*V_alpha[i] * pbar/ Ebar;
+	for(int i = 0; i < n; i++) dalphaX += unit_vec[i]*V_alpha[i]/energy_unit;
 
 	// gauss laguerre (a = 2)
 	return detJ * pbar * pz_unit * pz_unit / energy_unit * exp(pbar) / (exp(Ebar-bn*(alphaB+dalphaX)) + a);
@@ -335,8 +345,8 @@ double modTxy_integrand(double xphi, double costheta, double pbar, double **A, d
 		{
 			p_unit[i] += A[i][k]*unit_vec[k];
 		}
-		p_unit[i] += (bn*V_alpha[i] - V_q[i]*Ebar)/pbar;
-		//p_unit[i] -= V_q[i]*Ebar/pbar;
+		//p_unit[i] += (bn*V_alpha[i] - V_q[i]*Ebar)/pbar;
+		p_unit[i] -= V_q[i]*Ebar/pbar;
 	}
 	double energy_unit = (mbar*mbar) / (pbar*pbar);
 	for(int i = 0; i < n; i++) energy_unit += p_unit[i] * p_unit[i];
@@ -349,6 +359,9 @@ double modTxy_integrand(double xphi, double costheta, double pbar, double **A, d
 
 	double dalphaX = 0.0;
 	//for(int i = 0; i < n; i++) dalphaX += unit_vec[i]*V_alpha[i]*pbar/Ebar;
+	//for(int i = 0; i < n; i++) dalphaX += p_unit[i]*V_alpha[i] / energy_unit;
+	//for(int i = 0; i < n; i++) dalphaX += p_unit[i]*V_alpha[i] * pbar/ Ebar;
+	for(int i = 0; i < n; i++) dalphaX += unit_vec[i]*V_alpha[i]/energy_unit;
 
 	// gauss laguerre (a = 2)
 	return detJ * pbar * px_unit * py_unit / energy_unit * exp(pbar) / (exp(Ebar-bn*(alphaB+dalphaX)) + a);
@@ -373,8 +386,8 @@ double modTxz_integrand(double xphi, double costheta, double pbar, double **A, d
 		{
 			p_unit[i] += A[i][k]*unit_vec[k];
 		}
-		p_unit[i] += (bn*V_alpha[i] - V_q[i]*Ebar)/pbar;
-		//p_unit[i] -= V_q[i]*Ebar/pbar;
+		//p_unit[i] += (bn*V_alpha[i] - V_q[i]*Ebar)/pbar;
+		p_unit[i] -= V_q[i]*Ebar/pbar;
 	}
 	double energy_unit = (mbar*mbar) / (pbar*pbar);
 	for(int i = 0; i < n; i++) energy_unit += p_unit[i] * p_unit[i];
@@ -387,6 +400,9 @@ double modTxz_integrand(double xphi, double costheta, double pbar, double **A, d
 
 	double dalphaX = 0.0;
 	//for(int i = 0; i < n; i++) dalphaX += unit_vec[i]*V_alpha[i]*pbar/Ebar;
+	//for(int i = 0; i < n; i++) dalphaX += p_unit[i]*V_alpha[i] / energy_unit;
+	//for(int i = 0; i < n; i++) dalphaX += p_unit[i]*V_alpha[i] * pbar/ Ebar;
+	for(int i = 0; i < n; i++) dalphaX += unit_vec[i]*V_alpha[i]/energy_unit;
 
 	// gauss laguerre (a = 2)
 	return detJ * pbar * px_unit * pz_unit / energy_unit * exp(pbar) / (exp(Ebar-bn*(alphaB+dalphaX)) + a);
@@ -411,8 +427,8 @@ double modTyz_integrand(double xphi, double costheta, double pbar, double **A, d
 		{
 			p_unit[i] += A[i][k]*unit_vec[k];
 		}
-		p_unit[i] += (bn*V_alpha[i] - V_q[i]*Ebar)/pbar;
-		//p_unit[i] -= V_q[i]*Ebar/pbar;
+		//p_unit[i] += (bn*V_alpha[i] - V_q[i]*Ebar)/pbar;
+		p_unit[i] -= V_q[i]*Ebar/pbar;
 	}
 	double energy_unit = (mbar*mbar) / (pbar*pbar);
 	for(int i = 0; i < n; i++) energy_unit += p_unit[i] * p_unit[i];
@@ -425,6 +441,9 @@ double modTyz_integrand(double xphi, double costheta, double pbar, double **A, d
 
 	double dalphaX = 0.0;
 	//for(int i = 0; i < n; i++) dalphaX += unit_vec[i]*V_alpha[i]*pbar/Ebar;
+	//for(int i = 0; i < n; i++) dalphaX += p_unit[i]*V_alpha[i] / energy_unit;
+	//for(int i = 0; i < n; i++) dalphaX += p_unit[i]*V_alpha[i] * pbar/ Ebar;
+	for(int i = 0; i < n; i++) dalphaX += unit_vec[i]*V_alpha[i]/energy_unit;
 
 	// gauss laguerre (a = 2)
 	return detJ * pbar * py_unit * pz_unit / energy_unit * exp(pbar) / (exp(Ebar-bn*(alphaB+dalphaX)) + a);
@@ -449,8 +468,8 @@ double modTtx_integrand(double xphi, double costheta, double pbar, double **A, d
 		{
 			p_unit[i] += A[i][k]*unit_vec[k];
 		}
-		p_unit[i] += (bn*V_alpha[i] - V_q[i]*Ebar)/pbar;
-		//p_unit[i] -= V_q[i]*Ebar/pbar;
+		//p_unit[i] += (bn*V_alpha[i] - V_q[i]*Ebar)/pbar;
+		p_unit[i] -= V_q[i]*Ebar/pbar;
 	}
 
 	double energy_unit = (mbar*mbar) / (pbar*pbar);
@@ -463,6 +482,9 @@ double modTtx_integrand(double xphi, double costheta, double pbar, double **A, d
 
 	double dalphaX = 0.0;
 	//for(int i = 0; i < n; i++) dalphaX += unit_vec[i]*V_alpha[i]*pbar/Ebar;
+	//for(int i = 0; i < n; i++) dalphaX += p_unit[i]*V_alpha[i] / energy_unit;
+	//for(int i = 0; i < n; i++) dalphaX += p_unit[i]*V_alpha[i] * pbar/ Ebar;
+	for(int i = 0; i < n; i++) dalphaX += unit_vec[i]*V_alpha[i]/energy_unit;
 
 	// gauss laguerre (a = 2)
 	return detJ * pbar * px_unit * exp(pbar) / (exp(Ebar-bn*(alphaB+dalphaX)) + a);
@@ -487,8 +509,8 @@ double modTty_integrand(double xphi, double costheta, double pbar, double **A, d
 		{
 			p_unit[i] += A[i][k]*unit_vec[k];
 		}
-		p_unit[i] += (bn*V_alpha[i] - V_q[i]*Ebar)/pbar;
-		//p_unit[i] -= V_q[i]*Ebar/pbar;
+		//p_unit[i] += (bn*V_alpha[i] - V_q[i]*Ebar)/pbar;
+		p_unit[i] -= V_q[i]*Ebar/pbar;
 	}
 
 	double energy_unit = (mbar*mbar) / (pbar*pbar);
@@ -501,6 +523,9 @@ double modTty_integrand(double xphi, double costheta, double pbar, double **A, d
 
 	double dalphaX = 0.0;
 	//for(int i = 0; i < n; i++) dalphaX += unit_vec[i]*V_alpha[i]*pbar/Ebar;
+	//for(int i = 0; i < n; i++) dalphaX += p_unit[i]*V_alpha[i] / energy_unit;
+	//for(int i = 0; i < n; i++) dalphaX += p_unit[i]*V_alpha[i] * pbar/ Ebar;
+	for(int i = 0; i < n; i++) dalphaX += unit_vec[i]*V_alpha[i]/energy_unit;
 
 	// gauss laguerre (a = 2)
 	return detJ * pbar * py_unit * exp(pbar) / (exp(Ebar-bn*(alphaB+dalphaX)) + a);
@@ -525,8 +550,8 @@ double modTtz_integrand(double xphi, double costheta, double pbar, double **A, d
 		{
 			p_unit[i] += A[i][k]*unit_vec[k];
 		}
-		p_unit[i] += (bn*V_alpha[i] - V_q[i]*Ebar)/pbar;
-		//p_unit[i] -= V_q[i]*Ebar/pbar;
+		//p_unit[i] += (bn*V_alpha[i] - V_q[i]*Ebar)/pbar;
+		p_unit[i] -= V_q[i]*Ebar/pbar;
 	}
 
 	double energy_unit = (mbar*mbar) / (pbar*pbar);
@@ -539,6 +564,9 @@ double modTtz_integrand(double xphi, double costheta, double pbar, double **A, d
 
 	double dalphaX = 0.0;
 	//for(int i = 0; i < n; i++) dalphaX += unit_vec[i]*V_alpha[i]*pbar/Ebar;
+	//for(int i = 0; i < n; i++) dalphaX += p_unit[i]*V_alpha[i] / energy_unit;
+	//for(int i = 0; i < n; i++) dalphaX += p_unit[i]*V_alpha[i] * pbar/ Ebar;
+	for(int i = 0; i < n; i++) dalphaX += unit_vec[i]*V_alpha[i]/energy_unit;
 
 	// gauss laguerre (a = 2)
 	return detJ * pbar * pz_unit * exp(pbar) / (exp(Ebar-bn*(alphaB+dalphaX)) + a);
@@ -571,8 +599,8 @@ double modVx_integrand(double xphi, double costheta, double pbar, double **A, do
 		{
 			p_unit[i] += A[i][k]*unit_vec[k];
 		}
-		p_unit[i] += (bn*V_alpha[i] - V_q[i]*Ebar)/pbar;
-		//p_unit[i] -= V_q[i]*Ebar/pbar;
+		//p_unit[i] += (bn*V_alpha[i] - V_q[i]*Ebar)/pbar;
+		p_unit[i] -= V_q[i]*Ebar/pbar;
 	}
 	double energy_unit = (mbar*mbar) / (pbar*pbar);
 	for(int i = 0; i < n; i++) energy_unit += p_unit[i] * p_unit[i]; // if include bulk would be bn * T/Tp * V_alpha[i]
@@ -586,6 +614,7 @@ double modVx_integrand(double xphi, double costheta, double pbar, double **A, do
 	//for(int i = 0; i < n; i++) dalphaX += unit_vec[i]*V_alpha[i]*pbar/Ebar;
 	//for(int i = 0; i < n; i++) dalphaX += p_unit[i]*V_alpha[i] / energy_unit;
 	//for(int i = 0; i < n; i++) dalphaX += p_unit[i]*V_alpha[i] * pbar/ Ebar;
+	for(int i = 0; i < n; i++) dalphaX += unit_vec[i]*V_alpha[i]/energy_unit;
 
 	// gauss laguerre (a = 1)
 	return detJ * bn * pbar * px_unit / energy_unit * exp(pbar) / (exp(Ebar-bn*(alphaB+dalphaX)) + a);
@@ -610,8 +639,8 @@ double modVy_integrand(double xphi, double costheta, double pbar, double **A, do
 		{
 			p_unit[i] += A[i][k]*unit_vec[k];
 		}
-		p_unit[i] += (bn*V_alpha[i] - V_q[i]*Ebar)/pbar;
-		//p_unit[i] -= V_q[i]*Ebar/pbar;
+		//p_unit[i] += (bn*V_alpha[i] - V_q[i]*Ebar)/pbar;
+		p_unit[i] -= V_q[i]*Ebar/pbar;
 	}
 	double energy_unit = (mbar*mbar) / (pbar*pbar);
 	for(int i = 0; i < n; i++) energy_unit += p_unit[i] * p_unit[i];
@@ -623,6 +652,9 @@ double modVy_integrand(double xphi, double costheta, double pbar, double **A, do
 
 	double dalphaX = 0.0;
 	//for(int i = 0; i < n; i++) dalphaX += unit_vec[i]*V_alpha[i]*pbar/Ebar;
+	//for(int i = 0; i < n; i++) dalphaX += p_unit[i]*V_alpha[i] / energy_unit;
+	//for(int i = 0; i < n; i++) dalphaX += p_unit[i]*V_alpha[i] * pbar/ Ebar;
+	for(int i = 0; i < n; i++) dalphaX += unit_vec[i]*V_alpha[i]/energy_unit;
 
 	// gauss laguerre (a = 1)
 	return detJ * bn * pbar * py_unit / energy_unit * exp(pbar) / (exp(Ebar-bn*(alphaB+dalphaX)) + a);
@@ -647,8 +679,8 @@ double modVz_integrand(double xphi, double costheta, double pbar, double **A, do
 		{
 			p_unit[i] += A[i][k]*unit_vec[k];
 		}
-		p_unit[i] += (bn*V_alpha[i] - V_q[i]*Ebar)/pbar;
-		//p_unit[i] -= V_q[i]*Ebar/pbar;
+		//p_unit[i] += (bn*V_alpha[i] - V_q[i]*Ebar)/pbar;
+		p_unit[i] -= V_q[i]*Ebar/pbar;
 	}
 	double energy_unit = (mbar*mbar) / (pbar*pbar);
 	for(int i = 0; i < n; i++) energy_unit += p_unit[i] * p_unit[i];
@@ -660,6 +692,9 @@ double modVz_integrand(double xphi, double costheta, double pbar, double **A, do
 
 	double dalphaX = 0.0;
 	//for(int i = 0; i < n; i++) dalphaX += unit_vec[i]*V_alpha[i]*pbar/Ebar;
+	//for(int i = 0; i < n; i++) dalphaX += p_unit[i]*V_alpha[i] / energy_unit;
+	//for(int i = 0; i < n; i++) dalphaX += p_unit[i]*V_alpha[i] * pbar/ Ebar;
+	for(int i = 0; i < n; i++) dalphaX += unit_vec[i]*V_alpha[i]/energy_unit;
 
 	// gauss laguerre (a = 1)
 	return detJ * bn * pbar * pz_unit / energy_unit * exp(pbar) / (exp(Ebar-bn*(alphaB+dalphaX)) + a);
@@ -689,8 +724,8 @@ double modN_integrand(double xphi, double costheta, double pbar, double **A, dou
 		{
 			p_unit[i] += A[i][k]*unit_vec[k];
 		}
-		p_unit[i] += (bn*V_alpha[i] - V_q[i]*Ebar)/pbar;
-		//p_unit[i] -= V_q[i]*Ebar/pbar;
+		//p_unit[i] += (bn*V_alpha[i] - V_q[i]*Ebar)/pbar;
+		p_unit[i] -= V_q[i]*Ebar/pbar;
 	}
 
 	double energy_unit = (mbar*mbar) / (pbar*pbar);
@@ -701,6 +736,8 @@ double modN_integrand(double xphi, double costheta, double pbar, double **A, dou
 	//for(int i = 0; i < n; i++) dalphaX += unit_vec[i]*V_alpha[i]*pbar/Ebar;
 	//for(int i = 0; i < n; i++) dalphaX += p_unit[i]*V_alpha[i] / energy_unit;
 	//for(int i = 0; i < n; i++) dalphaX += p_unit[i]*V_alpha[i] * pbar/ Ebar;
+	//for(int i = 0; i < n; i++) dalphaX += unit_vec[i]*V_alpha[i]/energy_unit;
+	
 
 	double detJ = 1.0 - pbar * unit_vec[0] * V_q[0] / Ebar;  // this is very makeshift
 

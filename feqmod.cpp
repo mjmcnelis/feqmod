@@ -215,10 +215,12 @@ int main()
 
 
 	// thermodynamic variables
-	double T = 0.155 * GEV_TO_INVERSE_FM;         // input temperature in fm^-1
-	double alphaB = 1.0;						  // baryon chemical potential over temperature
+	double T = 0.13 * GEV_TO_INVERSE_FM;           // input temperature in fm^-1
+	double muB = 0.45 * GEV_TO_INVERSE_FM;         // baryon chemical potential
 
+	double alphaB = muB/T;						  // baryon chemical potential over temperature
 
+	// maybe I need to dail the temperature down
 
 	// equilibrium quantities
 	double factor_nBeq = pow(T,3) / (2.0*M_PI*M_PI);   // net baryon density
@@ -262,9 +264,11 @@ int main()
 
 
 	// Initialize baryon diffusion current
-	double Vx = 0.0 * nBeq;
+	//double Vx = 0.1 * betaV*(Eeq+Peq)/(nBeq*T);
+	double Vx = 0.1 * nBeq;
 	double Vy = 0.0 * nBeq;
 	double Vz = 0.0 * nBeq;
+
 
 
 
@@ -328,6 +332,8 @@ int main()
 	}
 
 	double betaV = bn2_J11 - nBeq*nBeq*T/(Eeq+Peq);
+
+
 
 
 	// momentum rescaling matrix A (p = A * p_prime)
@@ -468,8 +474,8 @@ int main()
 	double modbulk = (modTxx + modTyy + modTzz)/3.0 - Peq;
 
 
-	//modVx += bn2_J11 * V_alpha[0];
-	//modTtx += nBeq * T * V_alpha[0];  // add truncated V_alpha correction
+	modVx += bn2_J11 * V_alpha[0];
+	modTtx += nBeq * T * V_alpha[0];  // add truncated V_alpha correction
 
 
 	// print input/output results for comparison

@@ -18,16 +18,16 @@
 
 
 // for thermal equilibrium functions (1D integral over pbar coordinate from 0 to infinity)
-double Gauss1D(double thermal_1D_integrand(double pbar, double mbar, double alphaB, int baryon, int sign), double * pbar_root, double * pbar_weight, int pbar_pts, double mbar, double alphaB, int baryon, int sign)
+double Gauss1D(double thermal_1D_integrand(double pbar, double mbar, double T, double muB, double b, double a), double * pbar_root, double * pbar_weight, int pbar_pts, double mbar, double T, double muB, double b, double a)
 {
 	double sum = 0.0;
-	for(int k = 0; k < pbar_pts; k++) sum += pbar_weight[k] * thermal_1D_integrand(pbar_root[k], mbar, alphaB, baryon, sign);
+	for(int k = 0; k < pbar_pts; k++) sum += pbar_weight[k] * thermal_1D_integrand(pbar_root[k], mbar, T, muB, b, a);
 	return sum;
 }
 
 
 // for modded thermal functions (3D integral now in spherical p_prime coordinates; i.e. {xphi, costheta, pbar} -> {xphi_prime, costheta_prime, pbar_prime})
-double GaussMod3D(double mod_thermal_3D_integrand(double xphi, double costheta, double pbar, double **A, double * V_q, double * V_alpha, int n, double mbar, double alphaB, int baryon, int sign), double * xphi_root, double * xphi_weight, double * costheta_root, double * costheta_weight, double * pbar_root, double * pbar_weight, int xphi_pts, int costheta_pts, int pbar_pts, double **A, double * V_q, double * V_alpha, int n, double mbar, double alphaB, int baryon, int sign)
+double GaussMod3D(double mod_thermal_3D_integrand(double xphi, double costheta, double pbar, double **A, double * Vq, double * Va, int n, double mbar, double T, double Tp, double muBp, double b, double a), double * xphi_root, double * xphi_weight, double * costheta_root, double * costheta_weight, double * pbar_root, double * pbar_weight, int xphi_pts, int costheta_pts, int pbar_pts, double **A, double * Vq, double * Va, int n, double mbar, double T, double Tp, double muBp, double b, double a)
 {
 	double sum = 0.0;
 	for(int i = 0; i < xphi_pts; i++)
@@ -36,7 +36,7 @@ double GaussMod3D(double mod_thermal_3D_integrand(double xphi, double costheta, 
 		{
 			for(int k = 0; k < pbar_pts; k++)
 			{
-				sum += xphi_weight[i] * costheta_weight[j] * pbar_weight[k] * mod_thermal_3D_integrand(xphi_root[i], costheta_root[j], pbar_root[k], A, V_q, V_alpha, n, mbar, alphaB, baryon, sign);
+				sum += xphi_weight[i] * costheta_weight[j] * pbar_weight[k] * mod_thermal_3D_integrand(xphi_root[i], costheta_root[j], pbar_root[k], A, Vq, Va, n, mbar, T, Tp, muBp, b, a);
 			}
 		}
 	}

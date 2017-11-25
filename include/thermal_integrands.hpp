@@ -6,39 +6,39 @@
 #define THERMAL_INTEGRANDS_H
 
 
-double nBeq_integrand(double pbar, double mbar, double alphaB, int baryon, int sign);
-double Eeq_integrand(double pbar, double mbar, double alphaB, int baryon, int sign);
-double Peq_integrand(double pbar, double mbar, double alphaB, int baryon, int sign);
+double nB_int(double pbar, double mbar, double T, double muB, double b, double a);
+double E_int(double pbar, double mbar, double T, double muB, double b, double a);
+double P_int(double pbar, double mbar, double T, double muB, double b, double a);
 
 
-double bn2_J10_integrand(double pbar, double mbar, double alphaB, int baryon, int sign);
-double bn2_J11_integrand(double pbar, double mbar, double alphaB, int baryon, int sign);
-double bn_J20_integrand(double pbar, double mbar, double alphaB, int baryon, int sign);
-double J30_integrand(double pbar, double mbar, double alphaB, int baryon, int sign);
-double J32_integrand(double pbar, double mbar, double alphaB, int baryon, int sign);
+double Z10_int(double pbar, double mbar, double T, double muB, double b, double a);
+double Z11_int(double pbar, double mbar, double T, double muB, double b, double a);
+double N20_int(double pbar, double mbar, double T, double muB, double b, double a);
+double J30_int(double pbar, double mbar, double T, double muB, double b, double a);
+double J32_int(double pbar, double mbar, double T, double muB, double b, double a);
 
-double neq_integrand(double pbar, double mbar, double alphaB, int baryon, int sign);
-double bn_J10_integrand(double pbar, double mbar, double alphaB, int baryon, int sign);
-double J20_integrand(double pbar, double mbar, double alphaB, int baryon, int sign);
-double J21_integrand(double pbar, double mbar, double alphaB, int baryon, int sign);
+double neq_int(double pbar, double mbar, double T, double muB, double b, double a);
+double N10_int(double pbar, double mbar, double T, double muB, double b, double a);
+double J20_int(double pbar, double mbar, double T, double muB, double b, double a);
+double J21_int(double pbar, double mbar, double T, double muB, double b, double a);
 
 
-double modE_integrand(double xphi, double costheta, double pbar, double **A, double * V_q, double * V_alpha, int n, double mbar, double alphaB, int baryon, int sign);
-double modTxx_integrand(double xphi, double costheta, double pbar, double **A, double * V_q, double * V_alpha, int n, double mbar, double alphaB, int baryon, int sign);
-double modTyy_integrand(double xphi, double costheta, double pbar, double **A, double * V_q, double * V_alpha, int n, double mbar, double alphaB, int baryon, int sign);
-double modTzz_integrand(double xphi, double costheta, double pbar, double **A, double * V_q, double * V_alpha, int n, double mbar, double alphaB, int baryon, int sign);
-double modTxy_integrand(double xphi, double costheta, double pbar, double **A, double * V_q, double * V_alpha, int n, double mbar, double alphaB, int baryon, int sign);
-double modTxz_integrand(double xphi, double costheta, double pbar, double **A, double * V_q, double * V_alpha, int n, double mbar, double alphaB, int baryon, int sign);
-double modTyz_integrand(double xphi, double costheta, double pbar, double **A, double * V_q, double * V_alpha, int n, double mbar, double alphaB, int baryon, int sign);
-double modTtx_integrand(double xphi, double costheta, double pbar, double **A, double * V_q, double * V_alpha, int n, double mbar, double alphaB, int baryon, int sign);
-double modTty_integrand(double xphi, double costheta, double pbar, double **A, double * V_q, double * V_alpha, int n, double mbar, double alphaB, int baryon, int sign);
-double modTtz_integrand(double xphi, double costheta, double pbar, double **A, double * V_q, double * V_alpha, int n, double mbar, double alphaB, int baryon, int sign);
+double modE_int(double xphi, double costheta, double pbar, double **A, double * Vq, double * Va, int n, double mbar, double T, double Tp, double muBp, double b, double a);
+double modTxx_int(double xphi, double costheta, double pbar, double **A, double * Vq, double * Va, int n, double mbar, double T, double Tp, double muBp, double b, double a);
+double modTyy_int(double xphi, double costheta, double pbar, double **A, double * Vq, double * Va, int n, double mbar, double T, double Tp, double muBp, double b, double a);
+double modTzz_int(double xphi, double costheta, double pbar, double **A, double * Vq, double * Va, int n, double mbar, double T, double Tp, double muBp, double b, double a);
+double modTxy_int(double xphi, double costheta, double pbar, double **A, double * Vq, double * Va, int n, double mbar, double T, double Tp, double muBp, double b, double a);
+double modTxz_int(double xphi, double costheta, double pbar, double **A, double * Vq, double * Va, int n, double mbar, double T, double Tp, double muBp, double b, double a);
+double modTyz_int(double xphi, double costheta, double pbar, double **A, double * Vq, double * Va, int n, double mbar, double T, double Tp, double muBp, double b, double a);
+double modTtx_int(double xphi, double costheta, double pbar, double **A, double * Vq, double * Va, int n, double mbar, double T, double Tp, double muBp, double b, double a);
+double modTty_int(double xphi, double costheta, double pbar, double **A, double * Vq, double * Va, int n, double mbar, double T, double Tp, double muBp, double b, double a);
+double modTtz_int(double xphi, double costheta, double pbar, double **A, double * Vq, double * Va, int n, double mbar, double T, double Tp, double muBp, double b, double a);
 
-double modVx_integrand(double xphi, double costheta, double pbar, double **A, double * V_q, double * V_alpha, int n, double mbar, double alphaB, int baryon, int sign);
-double modVy_integrand(double xphi, double costheta, double pbar, double **A, double * V_q, double * V_alpha, int n, double mbar, double alphaB, int baryon, int sign);
-double modVz_integrand(double xphi, double costheta, double pbar, double **A, double * V_q, double * V_alpha, int n, double mbar, double alphaB, int baryon, int sign);
+double modVx_int(double xphi, double costheta, double pbar, double **A, double * Vq, double * Va, int n, double mbar, double T, double Tp, double muBp, double b, double a);
+double modVy_int(double xphi, double costheta, double pbar, double **A, double * Vq, double * Va, int n, double mbar, double T, double Tp, double muBp, double b, double a);
+double modVz_int(double xphi, double costheta, double pbar, double **A, double * Vq, double * Va, int n, double mbar, double T, double Tp, double muBp, double b, double a);
 
-double modN_integrand(double xphi, double costheta, double pbar, double **A, double * V_q, double * V_alpha, int n, double mbar, double alphaB, int baryon, int sign);
+double modn_int(double xphi, double costheta, double pbar, double **A, double * Vq, double * Va, int n, double mbar, double T, double Tp, double muBp, double b, double a);
 
 
 #endif

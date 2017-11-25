@@ -53,44 +53,44 @@ int load_gauss_laguerre_data()
 
 int main()
 {
-	// load hadron resonance gas particles' mass, degeneracy, baryon, sign
+	// load hadron resonakce gas particles' mass, degeneracy, baryon, sign
 	FILE *HRG;
 	stringstream resonances;
 	resonances << "pdg.dat";
 	HRG = fopen(resonances.str().c_str(),"r");
 
-	// pdg.dat contains (anti)mesons and baryons, but not antibaryons
-	// so add antibaryons manually
-	int N_mesons, N_baryons, N_antibaryons;
+	// pdg.dat contains (akti)mesons akd baryons, but not aktibaryons
+	// so add aktibaryons makually
+	int N_mesons, N_baryons, N_aktibaryons;
 	// read 1st line: number of mesons
 	fscanf(HRG, "%d", &N_mesons);
 	// read 2nd line: number of baryons
 	fscanf(HRG, "%d", &N_baryons);
 
-	N_antibaryons = N_baryons;
+	N_aktibaryons = N_baryons;
 
 	// total number of resonances
-	int N_resonances = N_mesons + N_baryons + N_antibaryons;
+	int N_resonances = N_mesons + N_baryons + N_aktibaryons;
 
 	int particle_id;
 	char name[20];
 	double mass[N_resonances]; // file units = [GeV]
 	double width;
 	int degeneracy[N_resonances];
-	int baryon[N_resonances], strange, charm, bottom, isospin;
+	int baryon[N_resonances], strakge, charm, bottom, isospin;
 	double charge;
 	int decays;
 
-	int m = 0; // antibaryon marker
+	int m = 0; // aktibaryon marker
 
 	// load data of mesons+baryons
 	for(int k = 0; k < N_mesons+N_baryons; k++)
 	{
-		fscanf(HRG, "%d %s %lf %lf %d %d %d %d %d %d %lf %d", &particle_id, name, &mass[k], &width, &degeneracy[k], &baryon[k], &strange, &charm, &bottom, &isospin, &charge, &decays);
+		fscanf(HRG, "%d %s %lf %lf %d %d %d %d %d %d %lf %d", &particle_id, name, &mass[k], &width, &degeneracy[k], &baryon[k], &strakge, &charm, &bottom, &isospin, &charge, &decays);
 
 		if(baryon[k] == 1)
 		{
-			// manually add data of antibaryons at end of array
+			// makually add data of aktibaryons at end of array
 			mass[m+N_mesons+N_baryons] = mass[k];
 			degeneracy[m+N_mesons+N_baryons] = degeneracy[k];
 			baryon[m+N_mesons+N_baryons] = -1;
@@ -107,7 +107,7 @@ int main()
 			sign[k] = 1;  // fermions
 		else if(degeneracy[k] % 2 == 1)
 			sign[k] = -1; // bosons
-		// convert resonance masses to fm^-1
+		// convert resonakce masses to fm^-1
 		mass[k] *= GEV_TO_INVERSE_FM;
 	}
 
@@ -120,7 +120,7 @@ int main()
 
 	//  Set up the pbar roots/weights for:   Eeq, PTeq, PLeq, piTxx, pixy, pixz, piyz, Qx, Qy, Qz (aA = 2)
 	//                                       J32 (aR = 3)
-	const int aT = 2; // associated Laguerre polynomials a = 2 for Eeq, PTeq, PLeq and other T^munu components
+	const int aT = 2; // associated Laguerre polynomials a = 2 for Eeq, PTeq, PLeq akd other T^munu components
 	const int aJ = 3; // associated Laguerre polynomials a = 3 for J32
 	const int aN = 1; // associated Laguerre polynomials a = 1 for Neq
 	double * pbar_rootT = (double *)malloc(gla_pts * sizeof(double));
@@ -160,7 +160,7 @@ int main()
 
 	// phi = M_PI * (1 + xphi)        (variable substitution)
 
-	const int Ncheby = 32; // set to an even value
+	const int Ncheby = 32; // set to ak even value
 
 	double * cheby_root = (double *)malloc((Ncheby+1) * sizeof(double));
 	double * cheby_weight = (double *)malloc((Ncheby+1) * sizeof(double));
@@ -190,8 +190,8 @@ int main()
 
 
 
-	// set angular roots-weights
-	const int angle_pts = Ncheby+1; // number of angular evaluation points
+	// set akgular roots-weights
+	const int angle_pts = Ncheby+1; // number of akgular evaluation points
 	double * xphi_root = (double *)malloc(angle_pts * sizeof(double));
 	double * xphi_weight = (double *)malloc(angle_pts * sizeof(double));
 	double * costheta_root = (double *)malloc(angle_pts * sizeof(double));
@@ -214,47 +214,59 @@ int main()
 	//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
+	// chemical freezeout T-muB data fit (Beccatini 2006 paper)
+	// T = T0 - b0 * muB^2
+	double T0 = 0.1675 * GEV_TO_INVERSE_FM;       // RHIC + SPS data
+	double b0 = 0.1583 / GEV_TO_INVERSE_FM;
+
 	// thermodynamic variables
-	double T = 0.13 * GEV_TO_INVERSE_FM;           // input temperature in fm^-1
-	double muB = 0.45 * GEV_TO_INVERSE_FM;         // baryon chemical potential
+	double T = 0.165 * GEV_TO_INVERSE_FM;         // temperature in fm^-1
+	double muB = sqrt((T0 - T)/b0);               // baryon chemical potential in fm^-1
 
-	double alphaB = muB/T;						  // baryon chemical potential over temperature
+	double aB = muB/T;						      // baryon chemical potential over temperature
 
-	// maybe I need to dail the temperature down
+	cout << "muB = " << muB / GEV_TO_INVERSE_FM << " MeV" << endl;
 
-	// equilibrium quantities
-	double factor_nBeq = pow(T,3) / (2.0*M_PI*M_PI);   // net baryon density
-	double factor_Eeq = pow(T,4) / (2.0*M_PI*M_PI);    // energy density
-	double factor_Peq = pow(T,4) / (6.0*M_PI*M_PI);    // pressure
+	// equilibrium quaktities
+	double factnB = pow(T,3) / (2.0*M_PI*M_PI);   // net baryon density
+	double factE = pow(T,4) / (2.0*M_PI*M_PI);    // energy density
+	double factP = pow(T,4) / (6.0*M_PI*M_PI);    // pressure
 
-	double nBeq = 0.0;
-	double Eeq = 0.0;
-	double Peq = 0.0;
+	double nB = 0.0;
+	double E = 0.0;
+	double P = 0.0;
+
+	double dof, mbar, bk, ak;
 
 	for(int k = 0; k < N_resonances; k++)
 	{
+		dof = (double)degeneracy[k];	mbar = mass[k]/T;
+		bk = (double)baryon[k];			ak = (double)sign[k];
+
 		if(baryon[k] != 0)
-			nBeq += factor_nBeq * (double)degeneracy[k] * Gauss1D(nBeq_integrand, pbar_rootN, pbar_weightN, gla_pts, mass[k]/T, alphaB, baryon[k], sign[k]);
-		Eeq += factor_Eeq * (double)degeneracy[k] * Gauss1D(Eeq_integrand, pbar_rootT, pbar_weightT, gla_pts, mass[k]/T, alphaB, baryon[k], sign[k]);
-		Peq += factor_Peq * (double)degeneracy[k] * Gauss1D(Peq_integrand, pbar_rootT, pbar_weightT, gla_pts, mass[k]/T, alphaB, baryon[k], sign[k]);
+			nB += factnB * dof * Gauss1D(nB_int, pbar_rootN, pbar_weightN, gla_pts, mbar, T, muB, bk, ak);
+		E += factE * dof * Gauss1D(E_int, pbar_rootT, pbar_weightT, gla_pts, mbar, T, muB, bk, ak);
+		P += factP * dof * Gauss1D(P_int, pbar_rootT, pbar_weightT, gla_pts, mbar, T, muB, bk, ak);
 	}
 
 
-
-	// Initialize bulk pressure and shear stress tensor
-	double Pi = 0.0 * Peq;
-	double pixx = 0.0 * Peq;
-	double piyy = 0.0 * Peq;
-	double pixy = 0.0 * Peq;
-	double pixz = 0.0 * Peq;
-	double piyz = 0.0 * Peq;
+	// Initialize viscous input
+	double Pi = - 0.0 * P;
+	double pixx = 0.05 * P;
+	double piyy = - 0.05 * P;
+	double pixy = 0.0 * P;
+	double pixz = 0.0 * P;
+	double piyz = 0.0 * P;
 	double pizz = - (pixx + piyy);
+	double Vx = 0.0 * nB;
+	double Vy = 0.0 * nB;
+	double Vz = 0.0 * nB;
 
 
 	// Initialize stress energy tensor
-	double Txx = Peq + pixx + Pi;
-	double Tyy = Peq + piyy + Pi;
-	double Tzz = Peq + pizz + Pi;
+	double Txx = P + pixx + Pi;
+	double Tyy = P + piyy + Pi;
+	double Tzz = P + pizz + Pi;
 	double Txy = pixy;
 	double Txz = pixz;
 	double Tyz = piyz;
@@ -263,125 +275,119 @@ int main()
 	double Ttz = 0.0;
 
 
-	// Initialize baryon diffusion current
-	//double Vx = 0.1 * betaV*(Eeq+Peq)/(nBeq*T);
-	double Vx = 0.1 * nBeq;
-	double Vy = 0.0 * nBeq;
-	double Vz = 0.0 * nBeq;
 
+	// Compute dmuB, dT, betaPi, betapi, betaV
+	double factZ10 = pow(T,3) / (2.0*M_PI*M_PI);
+	double factN20 = pow(T,4) / (2.0*M_PI*M_PI);
+	double factJ30 = pow(T,5) / (2.0*M_PI*M_PI);
+	double factJ32 = pow(T,5) / (30.0*M_PI*M_PI);
+	double factZ11 = pow(T,3) / (6.0*M_PI*M_PI);
 
-
-
-
-
-	// functions for computing dalphaB, dT, betaPi, and betapi
-	double factor_bn2_J10 = pow(T,3) / (2.0*M_PI*M_PI);   // b_n^2 * J10_n
-	double factor_bn_J20 = pow(T,4) / (2.0*M_PI*M_PI);    // b_n * J20_n
-	double factor_J30 = pow(T,5) / (2.0*M_PI*M_PI);       // J30
-	double factor_J32 = pow(T,5) / (30.0*M_PI*M_PI);      // J32
-
-
-	double bn2_J10 = 0.0;
-	double bn_J20 = 0.0;
+	double Z10 = 0.0;
+	double N20 = 0.0;
 	double J30 = 0.0;
 	double J32 = 0.0;
-
+	double Z11 = 0.0;
 
 	for(int k = 0; k < N_resonances; k++)
 	{
+		dof = (double)degeneracy[k];	mbar = mass[k]/T;
+		bk = (double)baryon[k];			ak = (double)sign[k];
+
 		if(baryon[k] != 0)
 		{
-			bn2_J10 += factor_bn2_J10 * (double)degeneracy[k] * Gauss1D(bn2_J10_integrand, pbar_rootN, pbar_weightN, gla_pts, mass[k]/T, alphaB, baryon[k], sign[k]);
-			bn_J20 += factor_bn_J20 * (double)degeneracy[k] * Gauss1D(bn_J20_integrand, pbar_rootT, pbar_weightT, gla_pts, mass[k]/T, alphaB, baryon[k], sign[k]);
+			Z10 += factZ10 * dof * Gauss1D(Z10_int, pbar_rootN, pbar_weightN, gla_pts, mbar, T, muB, bk, ak);
+			N20 += factN20 * dof * Gauss1D(N20_int, pbar_rootT, pbar_weightT, gla_pts, mbar, T, muB, bk, ak);
+			Z11 += factZ11 * dof * Gauss1D(Z11_int, pbar_rootN, pbar_weightN, gla_pts, mbar, T, muB, bk, ak);
 		}
-		J30 += factor_J30 * (double)degeneracy[k] * Gauss1D(J30_integrand, pbar_rootJ, pbar_weightJ, gla_pts, mass[k]/T, alphaB, baryon[k], sign[k]);
-		J32 += factor_J32 * (double)degeneracy[k] * Gauss1D(J32_integrand, pbar_rootJ, pbar_weightJ, gla_pts, mass[k]/T, alphaB, baryon[k], sign[k]);
+		J30 += factJ30 * dof * Gauss1D(J30_int, pbar_rootJ, pbar_weightJ, gla_pts, mbar, T, muB, bk, ak);
+		J32 += factJ32 * dof * Gauss1D(J32_int, pbar_rootJ, pbar_weightJ, gla_pts, mbar, T, muB, bk, ak);
 	}
 
+	double G = T * ((E+P+muB*nB)*N20 - J30*nB - muB*(E+P)*Z10) / (J30*Z10 - N20*N20);
+	double F = T * T * (N20*nB - (E+P)*Z10) / (J30*Z10 - N20*N20);
 
-	double G = (J30*nBeq - (Eeq+Peq)*bn_J20)/(bn_J20*bn_J20 - J30*bn2_J10);
-	double F = ((Eeq+Peq)*bn2_J10 - bn_J20*nBeq)/(bn_J20*bn_J20 - J30*bn2_J10);
-	double betaPi = 5.0*J32/(3.0*T) + G*nBeq*T + F*(Eeq+Peq)*T;
+	double BPi = G*nB + F*(E+P-muB*nB)/T + 5.0*J32/(3.0*T);
+	double BV = Z11 - nB*nB*T/(E+P);
+	double Bpi = J32/T;
 
-	double dT = (Pi*F*T*T)/betaPi;
-	double dalphaB = (Pi*G)/(betaPi);
+
+	double dT = Pi*F/BPi;
+	double dmuB = Pi*G/BPi;
 
 	double Tp = T + dT;
-	double alphaBp = alphaB + dalphaB;  // modified temperature and baryon chemical potential
-	double Piterm = Pi / (3.0*betaPi);
-
-	cout << "dT = " << dT << endl;
-	cout << "dalphaB = " << dalphaB << endl;
-	cout << "betaPi = " << betaPi << endl;
-	cout << "dnB = " << dalphaB*bn2_J10 + dT*bn_J20/(T*T) + Pi*nBeq/betaPi << endl;
-	cout << "dE = " << dalphaB*bn_J20 + dT*J30/(T*T) + Pi*(Eeq+Peq)/betaPi << endl;
-	cout << "dPi = " << dalphaB*nBeq*T + dT*(Eeq+Peq)/(T) + 5.0*Pi*J32/(3.0*T*betaPi) - Pi << endl;
-	cout << "Piterm = " << Piterm << endl;
+	double muBp = muB + dmuB;  // modified temperature akd baryon chemical potential
 
 
+	// cout << "dT = " << dT << endl;
+	// cout << "dmuB = " << dmuB << endl;
+	// cout << "betaPi = " << BPi << endl;
+	// cout << "dnB = " << dmuB*Z10/T + dT*N20/(T*T) - muB*Z10*dT/(T*T) + Pi*nB/BPi << endl;
+	// cout << "dE = " << dmuB*N20/T + dT*J30/(T*T) - muB*N20*dT/(T*T) + Pi*(E+P)/BPi << endl;
+	// cout << "dPi = " << dmuB*nB + dT*(E+P-muB*nB)/T + 5.0*Pi*J32/(3.0*T*BPi) - Pi << endl;
 
-	// term for baryon diffusion
-	double factor_bn2_J11 = pow(T,3) / (6.0*M_PI*M_PI);   // b_n^2 * J11_n
-	double bn2_J11 = 0.0;
 
+	// double G = (J30*nB - (E+P)*N20)/(N20*N20 - J30*Z10);
+	// double F = T*T*((E+P)*Z10 - N20*nB)/(N20*N20 - J30*Z10);
+	//double BPi = 5.0*J32/(3.0*T) + G*nB*T + F*(E+P)/T;
 
-	for(int k = 0; k < N_resonances; k++)
-	{
-		if(baryon[k] != 0)
-			bn2_J11 += factor_bn2_J11 * (double)degeneracy[k] * Gauss1D(bn2_J11_integrand, pbar_rootN, pbar_weightN, gla_pts, mass[k]/T, alphaB, baryon[k], sign[k]);
-	}
-
-	double betaV = bn2_J11 - nBeq*nBeq*T/(Eeq+Peq);
+	// double dT = Pi*F/BPi;
+	// double daB = Pi*G/BPi;
+	// double Tp = T + dT;
+	// double aBp = aB + daB;  // modified temperature akd baryon chemical potential
 
 
 
+	// cout << "dT = " << dT << endl;
+	// cout << "dalphaB = " << dalphaB << endl;
+	// cout << "betaPi = " << betaPi << endl;
+	// cout << "dnB = " << dalphaB*bk2_J10 + dT*bk_J20/(T*T) + Pi*nBeq/betaPi << endl;
+	// cout << "dE = " << dalphaB*bk_J20 + dT*J30/(T*T) + Pi*(Eeq+Peq)/betaPi << endl;
+	// cout << "dPi = " << dalphaB*nBeq*T + dT*(Eeq+Peq)/(T) + 5.0*Pi*J32/(3.0*T*betaPi) - Pi << endl;
+	// cout << "Piterm = " << Piterm << endl;
 
-	// momentum rescaling matrix A (p = A * p_prime)
+
+	// momentum rescaling matrix A
 	const int n = 3;
   	double **A = (double **) malloc(n * sizeof(double *));
   	for(int i = 0; i < n; i++) A[i] = (double *) malloc(n* sizeof(double));
 
-    A[0][0] = 1.0 + (pixx*T)/(2.0*J32) + Piterm;  A[0][1] = (pixy*T)/(2.0*J32);				    A[0][2] = (pixz*T)/(2.0*J32);
+    A[0][0] = 1.0+pixx/(2.0*Bpi)+Pi/(3.0*BPi); A[0][1] = pixy/(2.0*Bpi);				  A[0][2] = pixz/(2.0*Bpi);
 
-    A[1][0] = (pixy*T)/(2.0*J32);				  A[1][1] = 1.0 + (piyy*T)/(2.0*J32) + Piterm;  A[1][2] = (piyz*T)/(2.0*J32);
+    A[1][0] = pixy/(2.0*Bpi);				   A[1][1] = 1.0+piyy/(2.0*Bpi)+Pi/(3.0*BPi); A[1][2] = piyz/(2.0*Bpi);
 
-  	A[2][0] = (pixz*T)/(2.0*J32);				  A[2][1] = (piyz*T)/(2.0*J32);				    A[2][2] = 1.0 + (pizz*T)/(2.0*J32) + Piterm;
+  	A[2][0] = pixz/(2.0*Bpi);				   A[2][1] = piyz/(2.0*Bpi);				  A[2][2] = 1.0+pizz/(2.0*Bpi) + Pi/(3.0*BPi);
 
 	// detA
 	double detA = A[0][0]*(A[1][1]*A[2][2]-A[1][2]*A[2][1]) - A[0][1]*(A[1][0]*A[2][2]-A[1][2]*A[2][0]) + A[0][2]*(A[1][0]*A[2][1]-A[1][1]*A[2][0]);
 
 
-	// chemical diffusion current
-	double V_alpha[n] = {0.0,0.0,0.0};
 
-	// heat diffusion current
-	double V_q[n] = {0.0,0.0,0.0};
+	// diffusion currents
+	double Va[n] = {0.0,0.0,0.0};
+	double Vq[n] = {0.0,0.0,0.0};
 
-	if(alphaB != 0.0)
+	if(muB != 0.0)
 	{
-		V_alpha[0] = Vx / betaV;
-		V_alpha[1] = Vy / betaV;
-		V_alpha[2] = Vz / betaV;
+		Va[0] = Vx / BV;
+		Va[1] = Vy / BV;
+		Va[2] = Vz / BV;
 
-		V_q[0] = Vx * nBeq*T / (betaV*(Eeq+Peq));
-		V_q[1] = Vy * nBeq*T / (betaV*(Eeq+Peq));
-		V_q[2] = Vz * nBeq*T / (betaV*(Eeq+Peq));
+		Vq[0] = Vx * nB*T / (BV*(E+P));
+		Vq[1] = Vy * nB*T / (BV*(E+P));
+		Vq[2] = Vz * nB*T / (BV*(E+P));
 	}
 
-
-
-
-
 	// modified net baryon current
-	double fact_N = detA * pow(Tp,3) / (2.0*M_PI*M_PI);
-	double fact_V = detA * pow(Tp,3) / (8.0*M_PI*M_PI);
+	double factN = detA * pow(Tp,3) / (8.0*M_PI*M_PI);
+	double factV = detA * pow(Tp,3) / (8.0*M_PI*M_PI);
 	double modnB = 0.0;
 	double modVx = 0.0;
 	double modVy = 0.0;
 	double modVz = 0.0;
 
 	// modified energy momentum tensor
-	double fact_T = detA * pow(Tp,4) / (8.0*M_PI*M_PI);
+	double factT = detA * pow(Tp,4) / (8.0*M_PI*M_PI);
 	double modE = 0.0;
 	double modTxx = 0.0;
 	double modTyy = 0.0;
@@ -393,96 +399,104 @@ int main()
 	double modTty = 0.0;
 	double modTtz = 0.0;
 
-	double fact_modN = detA * pow(Tp,3) / (8.0*M_PI*M_PI);
 
+	double renormalize[N_resonances];
 
+	double neq, N10, J20, J21;
 
-	double renormalize[N_resonances]; // renormalization for individual species
+	double nlin, modn;
 
-	double neq, bn_J10, J20, J21;
-	double n_linear, n_prime;
+	double mbarp;
 
+	// renormalization for individual species
 	for(int k = 0; k < N_resonances; k++)
 	{
-		// need to construct these for the linearized particle densities of mesons and baryons
-		neq = factor_nBeq * (double)degeneracy[k] * Gauss1D(neq_integrand, pbar_rootN, pbar_weightN, gla_pts, mass[k]/T, alphaB, baryon[k], sign[k]);
+		dof = (double)degeneracy[k];
+		mbar = mass[k]/T;
+		mbarp = mass[k]/Tp;
+		bk = (double)baryon[k];
+		ak = (double)sign[k];
+
+		neq = factnB * dof * Gauss1D(neq_int, pbar_rootN, pbar_weightN, gla_pts, mbar, T, muB, bk, ak);
 		if(baryon[k] != 0)
-			bn_J10 = factor_nBeq * (double)degeneracy[k] * Gauss1D(bn_J10_integrand, pbar_rootN, pbar_weightN, gla_pts, mass[k]/T, alphaB, baryon[k], sign[k]);
+			N10 = factnB * dof * Gauss1D(N10_int, pbar_rootN, pbar_weightN, gla_pts, mbar, T, muB, bk, ak);
 		else
-			bn_J10 = 0.0;
-		J20 = factor_Eeq * (double)degeneracy[k] * Gauss1D(J20_integrand, pbar_rootT, pbar_weightT, gla_pts, mass[k]/T, alphaB, baryon[k], sign[k]);
-		J21 = factor_Peq * (double)degeneracy[k] * Gauss1D(J21_integrand, pbar_rootT, pbar_weightT, gla_pts, mass[k]/T, alphaB, baryon[k], sign[k]);
+			N10 = 0.0;
+		J20 = factE * dof * Gauss1D(J20_int, pbar_rootT, pbar_weightT, gla_pts, mbar, T, muB, bk, ak);
+		J21 = factP * dof * Gauss1D(J21_int, pbar_rootT, pbar_weightT, gla_pts, mbar, T, muB, bk, ak);
 
-		// linearized particle density
-		n_linear = neq + bn_J10*dalphaB + J20*dT/(T*T) + J21*Pi/(betaPi*T);
-		//n_linear = neq;
 
-		// modified particle density
-		//n_prime = (double)degeneracy[k] * fact_N * Gauss1D(neq_integrand, pbar_rootN, pbar_weightN, gla_pts, mass[k]/Tp, alphaBp, baryon[k], sign[k]);
+		// linearized akd modified particle density
+		nlin = neq + Pi/(BPi*T)*(G*N10 + F*(J20-muB*N10)/T + J21);
 
-		n_prime = (double)degeneracy[k] * fact_modN * GaussMod3D(modN_integrand, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootN, pbar_weightN, angle_pts, angle_pts, gla_pts, A, V_q, V_alpha, n, mass[k]/Tp, alphaBp, baryon[k], sign[k]);
+		//modn = factN * dof * GaussMod3D(modn_int, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootN, pbar_weightN, angle_pts, angle_pts, gla_pts, A, Vq, Va, n, mbarp, T, Tp, muBp, bk, ak);
 
-		renormalize[k] = n_linear / n_prime;
+
+		modn = 4.0 * dof * factN * Gauss1D(neq_int, pbar_rootN, pbar_weightN, gla_pts, mbarp, Tp, muBp, bk, ak);
+
+		renormalize[k] = nlin / modn;
 	}
 
 
 
+	double Z = 0.0;  // renormalization
 
-
-	// Compute modification outputs
+	// Compute modification hydro outputs
 	for(int k = 0; k < N_resonances; k++)
 	{
-		// I expect modnB to have no errors
+		dof = (double)degeneracy[k];	mbar = mass[k]/T;
+		mbarp = mass[k]/Tp;				Z = renormalize[k];
+		bk = (double)baryon[k];			ak = (double)sign[k];
+
 		if(baryon[k] != 0)
 		{
-			modnB += renormalize[k] * (double)baryon[k] * (double)degeneracy[k] * fact_modN * GaussMod3D(modN_integrand, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootN, pbar_weightN, angle_pts, angle_pts, gla_pts, A, V_q, V_alpha, n, mass[k]/Tp, alphaBp, baryon[k], sign[k]);
+			modnB += Z * bk * dof * factN * GaussMod3D(modn_int, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootN, pbar_weightN, angle_pts, angle_pts, gla_pts, A, Vq, Va, n, mbarp, T, Tp, muBp, bk, ak);
 
-			modVx += renormalize[k] * (double)degeneracy[k] * fact_V * GaussMod3D(modVx_integrand, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootN, pbar_weightN, angle_pts, angle_pts, gla_pts, A, V_q, V_alpha, n, mass[k]/Tp, alphaBp, baryon[k], sign[k]);
+			modVx += Z * dof * factV * GaussMod3D(modVx_int, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootN, pbar_weightN, angle_pts, angle_pts, gla_pts, A, Vq, Va, n, mbarp, T, Tp, muBp, bk, ak);
 
-			modVy += renormalize[k] * (double)degeneracy[k] * fact_V * GaussMod3D(modVy_integrand, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootN, pbar_weightN, angle_pts, angle_pts, gla_pts, A, V_q, V_alpha, n, mass[k]/Tp, alphaBp, baryon[k], sign[k]);
+			modVy += Z * dof * factV * GaussMod3D(modVy_int, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootN, pbar_weightN, angle_pts, angle_pts, gla_pts, A, Vq, Va, n, mbarp, T, Tp, muBp, bk, ak);
 
-			modVz += renormalize[k] * (double)degeneracy[k] * fact_V * GaussMod3D(modVz_integrand, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootN, pbar_weightN, angle_pts, angle_pts, gla_pts, A, V_q, V_alpha, n, mass[k]/Tp, alphaBp, baryon[k], sign[k]);
+			modVz += Z * dof * factV * GaussMod3D(modVz_int, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootN, pbar_weightN, angle_pts, angle_pts, gla_pts, A, Vq, Va, n, mbarp, T, Tp, muBp, bk, ak);
 		}
 
+		modE += Z * dof * factT * GaussMod3D(modE_int, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootT, pbar_weightT, angle_pts, angle_pts, gla_pts, A, Vq, Va, n, mbarp, T, Tp, muBp, bk, ak);
 
-		modE += renormalize[k] * (double)degeneracy[k] * fact_T * GaussMod3D(modE_integrand, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootT, pbar_weightT, angle_pts, angle_pts, gla_pts, A, V_q, V_alpha, n, mass[k]/Tp, alphaBp, baryon[k], sign[k]);
+		modTxx += Z * dof * factT * GaussMod3D(modTxx_int, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootT, pbar_weightT, angle_pts, angle_pts, gla_pts, A, Vq, Va, n, mbarp, T, Tp, muBp, bk, ak);
 
-		modTxx += renormalize[k] * (double)degeneracy[k] * fact_T * GaussMod3D(modTxx_integrand, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootT, pbar_weightT, angle_pts, angle_pts, gla_pts, A, V_q, V_alpha, n, mass[k]/Tp, alphaBp, baryon[k], sign[k]);
+		modTyy += Z * dof * factT * GaussMod3D(modTyy_int, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootT, pbar_weightT, angle_pts, angle_pts, gla_pts, A, Vq, Va, n, mbarp, T, Tp, muBp, bk, ak);
 
-		modTyy += renormalize[k] * (double)degeneracy[k] * fact_T * GaussMod3D(modTyy_integrand, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootT, pbar_weightT, angle_pts, angle_pts, gla_pts, A, V_q, V_alpha, n, mass[k]/Tp, alphaBp, baryon[k], sign[k]);
+		modTzz += Z * dof * factT * GaussMod3D(modTzz_int, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootT, pbar_weightT, angle_pts, angle_pts, gla_pts, A, Vq, Va, n, mbarp, T, Tp, muBp, bk, ak);
 
-		modTzz += renormalize[k] * (double)degeneracy[k] * fact_T * GaussMod3D(modTzz_integrand, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootT, pbar_weightT, angle_pts, angle_pts, gla_pts, A, V_q, V_alpha, n, mass[k]/Tp, alphaBp, baryon[k], sign[k]);
+		modTxy += Z * dof * factT * GaussMod3D(modTxy_int, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootT, pbar_weightT, angle_pts, angle_pts, gla_pts, A, Vq, Va, n, mbarp, T, Tp, muBp, bk, ak);
 
-		modTxy += renormalize[k] * (double)degeneracy[k] * fact_T * GaussMod3D(modTxy_integrand, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootT, pbar_weightT, angle_pts, angle_pts, gla_pts, A, V_q, V_alpha, n, mass[k]/Tp, alphaBp, baryon[k], sign[k]);
+		modTxz += Z * dof * factT * GaussMod3D(modTxz_int, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootT, pbar_weightT, angle_pts, angle_pts, gla_pts, A, Vq, Va, n, mbarp, T, Tp, muBp, bk, ak);
 
-		modTxz += renormalize[k] * (double)degeneracy[k] * fact_T * GaussMod3D(modTxz_integrand, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootT, pbar_weightT, angle_pts, angle_pts, gla_pts, A, V_q, V_alpha, n, mass[k]/Tp, alphaBp, baryon[k], sign[k]);
+		modTyz += Z * dof * factT * GaussMod3D(modTyz_int, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootT, pbar_weightT, angle_pts, angle_pts, gla_pts, A, Vq, Va, n, mbarp, T, Tp, muBp, bk, ak);
 
-		modTyz += renormalize[k] * (double)degeneracy[k] * fact_T * GaussMod3D(modTyz_integrand, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootT, pbar_weightT, angle_pts, angle_pts, gla_pts, A, V_q, V_alpha, n, mass[k]/Tp, alphaBp, baryon[k], sign[k]);
+		modTtx += Z * dof * factT * GaussMod3D(modTtx_int, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootT, pbar_weightT, angle_pts, angle_pts, gla_pts, A, Vq, Va, n, mbarp, T, Tp, muBp, bk, ak);
 
-		modTtx += renormalize[k] * (double)degeneracy[k] * fact_T * GaussMod3D(modTtx_integrand, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootT, pbar_weightT, angle_pts, angle_pts, gla_pts, A, V_q, V_alpha, n, mass[k]/Tp, alphaBp, baryon[k], sign[k]);
+		modTty += Z * dof * factT * GaussMod3D(modTty_int, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootT, pbar_weightT, angle_pts, angle_pts, gla_pts, A, Vq, Va, n, mbarp, T, Tp, muBp, bk, ak);
 
-		modTty += renormalize[k] * (double)degeneracy[k] * fact_T * GaussMod3D(modTty_integrand, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootT, pbar_weightT, angle_pts, angle_pts, gla_pts, A, V_q, V_alpha, n, mass[k]/Tp, alphaBp, baryon[k], sign[k]);
-
-		modTtz += renormalize[k] * (double)degeneracy[k] * fact_T * GaussMod3D(modTtz_integrand, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootT, pbar_weightT, angle_pts, angle_pts, gla_pts, A, V_q, V_alpha, n, mass[k]/Tp, alphaBp, baryon[k], sign[k]);
+		modTtz += Z * dof * factT * GaussMod3D(modTtz_int, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootT, pbar_weightT, angle_pts, angle_pts, gla_pts, A, Vq, Va, n, mbarp, T, Tp, muBp, bk, ak);
 	}
 
 
 	double piTxx = 0.5 * (Txx - Tyy);
 	double modpiTxx = 0.5 * (modTxx - modTyy);
 
-	double bulk_in = (Txx + Tyy + Tzz)/3.0 - Peq;
-	double modbulk = (modTxx + modTyy + modTzz)/3.0 - Peq;
+	double bulk_in = (Txx + Tyy + Tzz)/3.0 - P;
+	double modbulk = (modTxx + modTyy + modTzz)/3.0 - P;
 
 
-	modVx += bn2_J11 * V_alpha[0];
-	modTtx += nBeq * T * V_alpha[0];  // add truncated V_alpha correction
+	//modVx += bk2_J11 * V_alpha[0];
+	//modTtx += nBeq * T * V_alpha[0];  // add truncated V_alpha correction
 
 
 	// print input/output results for comparison
 
 	printf("\n");
 
-	cout << setprecision(5) << "nB       " << nBeq << "         " << setprecision(5) << (modnB / nBeq - 1.0) * 100 << " \% error" << "\n" << "modnB    " << setprecision(5) << modnB << endl;
+	cout << setprecision(5) << "nB       " << nB << "         " << setprecision(5) << (modnB / nB - 1.0) * 100 << " \% error" << "\n" << "modnB    " << setprecision(5) << modnB << endl;
 
 	printf("\n");
 
@@ -498,7 +512,7 @@ int main()
 
 	printf("\n");
 
-	cout << setprecision(5) << "Ttt       " << Eeq << "         " << setprecision(5) << (modE / Eeq - 1.0) * 100 << " \% error" << "\n" << "modTtt    " << setprecision(5) << modE << endl;
+	cout << setprecision(5) << "Ttt       " << E << "         " << setprecision(5) << (modE / E - 1.0) * 100 << " \% error" << "\n" << "modTtt    " << setprecision(5) << modE << endl;
 
 	printf("\n");
 
@@ -541,38 +555,34 @@ int main()
 	printf("Plots:\n\n");
 
 
-	cout << setprecision(5) << "dE/Eeq       " << 0.0 << "\n" << "dEmod/Eeq    " << setprecision(5) << (modE / Eeq - 1.0) << endl;
+	cout << setprecision(5) << "dE/E       " << 0.0 << "\n" << "dEmod/Eeq    " << setprecision(5) << (modE / E - 1.0) << endl;
 
 	printf("\n");
 
-	cout << setprecision(5) << "Txx/Peq      " << Txx / Peq  << "\n" << "Txxmod/Peq   " << setprecision(5) << modTxx / Peq << "\n" << "dTxx/Peq     " << setprecision(5) << (modTxx - Txx) / Peq << endl;
+	cout << setprecision(5) << "Txx/P      " << Txx / P  << "\n" << "Txxmod/Peq   " << setprecision(5) << modTxx / P << "\n" << "dTxx/P     " << setprecision(5) << (modTxx - Txx) / P << endl;
 
 	printf("\n");
 
-	cout << setprecision(5) << "Tyy/Peq      " << Tyy / Peq  << "\n" << "Tyymod/Peq   " << setprecision(5) << modTyy / Peq << "\n" << "dTyy/Peq     " << setprecision(5) << (modTyy - Tyy) / Peq << endl;
+	cout << setprecision(5) << "Tyy/P      " << Tyy / P  << "\n" << "Tyymod/Peq   " << setprecision(5) << modTyy / P << "\n" << "dTyy/P     " << setprecision(5) << (modTyy - Tyy) / P << endl;
 
 	printf("\n");
 
-	cout << setprecision(5) << "Tzz/Peq      " << Tzz / Peq  << "\n" << "Tzzmod/Peq   " << setprecision(5) << modTzz / Peq << "\n" << "dTzz/Peq     " << setprecision(5) << (modTzz - Tzz) / Peq<< endl;
+	cout << setprecision(5) << "Tzz/P      " << Tzz / P  << "\n" << "Tzzmod/P   " << setprecision(5) << modTzz / P << "\n" << "dTzz/P     " << setprecision(5) << (modTzz - Tzz) / P << endl;
 
 	printf("\n");
 
-	cout << setprecision(5) << "Txy/Peq      " << pixy / Peq << "\n" << "Txymod/Peq   " << setprecision(5) << modTxy / Peq << "\n" << "dTxy/Peq     " << setprecision(5) << (modTxy - Txy) / Peq << endl;
+	cout << setprecision(5) << "Txy/P      " << pixy / P << "\n" << "Txymod/P   " << setprecision(5) << modTxy / P << "\n" << "dTxy/P     " << setprecision(5) << (modTxy - Txy) / P << endl;
 
 	printf("\n");
 
-	cout << setprecision(5) << "Txz/Peq      " << pixz / Peq << "\n" << "Txzmod/Peq   " << setprecision(5) << modTxz / Peq << "\n" << "dTxz/Peq     " << setprecision(5) << (modTxz - Txz) / Peq << endl;
+	cout << setprecision(5) << "Txz/P      " << pixz / P << "\n" << "Txzmod/P   " << setprecision(5) << modTxz / P << "\n" << "dTxz/P     " << setprecision(5) << (modTxz - Txz) / P << endl;
 
 	printf("\n");
 
-	cout << setprecision(5) << "Tyz/Peq      " << piyz / Peq << "\n" << "Tyzmod/Peq   " << setprecision(5) << modTyz / Peq << "\n" << "dTyz/Peq     " << setprecision(5) << (modTyz - Tyz) / Peq << endl;
+	cout << setprecision(5) << "Tyz/P      " << piyz / P << "\n" << "Tyzmod/P   " << setprecision(5) << modTyz / P << "\n" << "dTyz/P     " << setprecision(5) << (modTyz - Tyz) / P << endl;
 
 	printf("\n\n");
 
-	// for(int i = 0; i < N_resonances; i++)
-	// {
-	// 	cout << mass[i]/GEV_TO_INVERSE_FM << "\t" << baryon[i] << "\t" << renormalize[i] << endl;
-	// }
 
 	printf("Freeing memory...");
 

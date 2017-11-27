@@ -220,12 +220,16 @@ int main()
 	double b0 = 0.1583 / GEV_TO_INVERSE_FM;
 
 	// thermodynamic variables
-	double T = 0.165 * GEV_TO_INVERSE_FM;         // temperature in fm^-1
+	double T = 0.120 * GEV_TO_INVERSE_FM;         // temperature in fm^-1
 	double muB = sqrt((T0 - T)/b0);               // baryon chemical potential in fm^-1
 
 	double aB = muB/T;						      // baryon chemical potential over temperature
 
-	cout << "muB = " << muB / GEV_TO_INVERSE_FM << " MeV" << endl;
+	cout << "muB = " << muB / GEV_TO_INVERSE_FM << " GeV" << endl;
+
+	cout << "muB = " << muB << " fm^-1" << endl;
+	cout << "T = " << T << " fm^-1" << endl;
+
 
 	// equilibrium quaktities
 	double factnB = pow(T,3) / (2.0*M_PI*M_PI);   // net baryon density
@@ -249,11 +253,14 @@ int main()
 		P += factP * dof * Gauss1D(P_int, pbar_rootT, pbar_weightT, gla_pts, mbar, T, muB, bk, ak);
 	}
 
+	cout << "Energy density = " << E << " fm^-4" << endl;
+	cout << "Pressure = " << P << " fm^-4" << endl;
+	cout << "nB = " << nB << " fm^-3" << endl;
 
 	// Initialize viscous input
 	double Pi = - 0.0 * P;
-	double pixx = 0.05 * P;
-	double piyy = - 0.05 * P;
+	double pixx = 0.5 * P;
+	double piyy = - 0.5 * P;
 	double pixy = 0.0 * P;
 	double pixz = 0.0 * P;
 	double piyz = 0.0 * P;
@@ -319,13 +326,13 @@ int main()
 	double muBp = muB + dmuB;  // modified temperature akd baryon chemical potential
 
 
-	// cout << "dT = " << dT << endl;
-	// cout << "dmuB = " << dmuB << endl;
-	// cout << "betaPi = " << BPi << endl;
-	// cout << "dnB = " << dmuB*Z10/T + dT*N20/(T*T) - muB*Z10*dT/(T*T) + Pi*nB/BPi << endl;
-	// cout << "dE = " << dmuB*N20/T + dT*J30/(T*T) - muB*N20*dT/(T*T) + Pi*(E+P)/BPi << endl;
-	// cout << "dPi = " << dmuB*nB + dT*(E+P-muB*nB)/T + 5.0*Pi*J32/(3.0*T*BPi) - Pi << endl;
-
+	cout << "dT = " << dT << endl;
+	cout << "dmuB = " << dmuB << endl;
+	cout << "betaPi = " << BPi << endl;
+	cout << "dnB = " << dmuB*Z10/T + dT*N20/(T*T) - muB*Z10*dT/(T*T) + Pi*nB/BPi << endl;
+	cout << "dE = " << dmuB*N20/T + dT*J30/(T*T) - muB*N20*dT/(T*T) + Pi*(E+P)/BPi << endl;
+	cout << "dPi = " << dmuB*nB + dT*(E+P-muB*nB)/T + 5.0*Pi*J32/(3.0*T*BPi) - Pi << endl;
+	cout << "Piterm = " << Pi/(3.0*BPi) << endl;
 
 	// double G = (J30*nB - (E+P)*N20)/(N20*N20 - J30*Z10);
 	// double F = T*T*((E+P)*Z10 - N20*nB)/(N20*N20 - J30*Z10);
@@ -356,11 +363,12 @@ int main()
 
     A[1][0] = pixy/(2.0*Bpi);				   A[1][1] = 1.0+piyy/(2.0*Bpi)+Pi/(3.0*BPi); A[1][2] = piyz/(2.0*Bpi);
 
-  	A[2][0] = pixz/(2.0*Bpi);				   A[2][1] = piyz/(2.0*Bpi);				  A[2][2] = 1.0+pizz/(2.0*Bpi) + Pi/(3.0*BPi);
+  	A[2][0] = pixz/(2.0*Bpi);				   A[2][1] = piyz/(2.0*Bpi);				  A[2][2] = 1.0+pizz/(2.0*Bpi)+Pi/(3.0*BPi);
 
 	// detA
 	double detA = A[0][0]*(A[1][1]*A[2][2]-A[1][2]*A[2][1]) - A[0][1]*(A[1][0]*A[2][2]-A[1][2]*A[2][0]) + A[0][2]*(A[1][0]*A[2][1]-A[1][1]*A[2][0]);
 
+	cout << "detA = " << detA << endl;
 
 
 	// diffusion currents
@@ -419,9 +427,13 @@ int main()
 
 		neq = factnB * dof * Gauss1D(neq_int, pbar_rootN, pbar_weightN, gla_pts, mbar, T, muB, bk, ak);
 		if(baryon[k] != 0)
+		{
 			N10 = factnB * dof * Gauss1D(N10_int, pbar_rootN, pbar_weightN, gla_pts, mbar, T, muB, bk, ak);
+		}
 		else
+		{
 			N10 = 0.0;
+		}
 		J20 = factE * dof * Gauss1D(J20_int, pbar_rootT, pbar_weightT, gla_pts, mbar, T, muB, bk, ak);
 		J21 = factP * dof * Gauss1D(J21_int, pbar_rootT, pbar_weightT, gla_pts, mbar, T, muB, bk, ak);
 
@@ -429,12 +441,23 @@ int main()
 		// linearized akd modified particle density
 		nlin = neq + Pi/(BPi*T)*(G*N10 + F*(J20-muB*N10)/T + J21);
 
+		// neq + Pi/(BPi*T)*(F*J20/T + J21)
+
 		//modn = factN * dof * GaussMod3D(modn_int, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootN, pbar_weightN, angle_pts, angle_pts, gla_pts, A, Vq, Va, n, mbarp, T, Tp, muBp, bk, ak);
 
 
 		modn = 4.0 * dof * factN * Gauss1D(neq_int, pbar_rootN, pbar_weightN, gla_pts, mbarp, Tp, muBp, bk, ak);
 
 		renormalize[k] = nlin / modn;
+
+		if(nlin < 0.0)
+		{
+			printf("\nNegative linear density\n");
+		}
+		if(modn < 0.0)
+		{
+			printf("\nNegative mod density\n");
+		}
 	}
 
 
@@ -559,27 +582,18 @@ int main()
 
 	printf("\n");
 
-	cout << setprecision(5) << "Txx/P      " << Txx / P  << "\n" << "Txxmod/Peq   " << setprecision(5) << modTxx / P << "\n" << "dTxx/P     " << setprecision(5) << (modTxx - Txx) / P << endl;
+	cout << setprecision(5) << "RPi/P      " << bulk_in / P  << "\n" << "RmodPi/Peq   " << setprecision(5) << modbulk / P << endl;
 
 	printf("\n");
 
-	cout << setprecision(5) << "Tyy/P      " << Tyy / P  << "\n" << "Tyymod/Peq   " << setprecision(5) << modTyy / P << "\n" << "dTyy/P     " << setprecision(5) << (modTyy - Tyy) / P << endl;
+	cout << setprecision(5) << "Rpi/P      " << sqrt(2.0) * piTxx / P  << "\n" << "modRpi/Peq   " << setprecision(5) << sqrt(2.0) * modpiTxx / P << endl;
+
+	cout << setprecision(5) << "dTxx/Txx      " << (modTxx - Txx) / Txx  << "\n" << endl;
+
+	cout << setprecision(5) << "dTyy/Tyy      " << (modTyy - Tyy) / Tyy  << "\n" << endl;
 
 	printf("\n");
 
-	cout << setprecision(5) << "Tzz/P      " << Tzz / P  << "\n" << "Tzzmod/P   " << setprecision(5) << modTzz / P << "\n" << "dTzz/P     " << setprecision(5) << (modTzz - Tzz) / P << endl;
-
-	printf("\n");
-
-	cout << setprecision(5) << "Txy/P      " << pixy / P << "\n" << "Txymod/P   " << setprecision(5) << modTxy / P << "\n" << "dTxy/P     " << setprecision(5) << (modTxy - Txy) / P << endl;
-
-	printf("\n");
-
-	cout << setprecision(5) << "Txz/P      " << pixz / P << "\n" << "Txzmod/P   " << setprecision(5) << modTxz / P << "\n" << "dTxz/P     " << setprecision(5) << (modTxz - Txz) / P << endl;
-
-	printf("\n");
-
-	cout << setprecision(5) << "Tyz/P      " << piyz / P << "\n" << "Tyzmod/P   " << setprecision(5) << modTyz / P << "\n" << "dTyz/P     " << setprecision(5) << (modTyz - Tyz) / P << endl;
 
 	printf("\n\n");
 

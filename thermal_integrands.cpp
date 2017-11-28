@@ -152,29 +152,19 @@ double modE_int(double xphi, double costheta, double pbar, double ** A, double *
 	{
 		for(int k = 0; k < n; k++)
 		{
-			p_unit[i] += A[i][k]*unit_vec[k] - 0.0*Vq[i]*Vq[k]*unit_vec[k];
+			p_unit[i] += A[i][k]*unit_vec[k];
 		}
-		//p_unit[i] += (b*(T/Tp)*Va[i] - Vq[i]*Ebar)/pbar;
-		//p_unit[i] += b*(T/Tp)*Va[i]/pbar;
+		p_unit[i] += (b*(T/Tp)*Va[i] - Vq[i]*Ebar)/pbar;
 	}
 
 	double energy_unit = (mbar*mbar) / (pbar*pbar);
 	for(int i = 0; i < n; i++) energy_unit += p_unit[i] * p_unit[i]; // E(p) / pbar_prime
 	energy_unit = sqrt(energy_unit);
 
-	double detJ = 1.0 - 0.0*Vq[0]*Vq[0] - pbar*unit_vec[0]*Vq[0]/Ebar;  // this is very makeshift
-
-	detJ = 1.0;
-
-	double dalphaX = 0.0;
-	for(int i = 0; i < n; i++) dalphaX += unit_vec[i]*Va[i]*pbar/Ebar;
-
-	double heat = 0.0;
-	//for(int i = 0; i < n; i++) heat += Vq[i]*unit_vec[i]*pbar;
-	for(int i = 0; i < n; i++) heat += Vq[i]*p_unit[i]*pbar;
+	double detJ = 1.0 - pbar*unit_vec[0]*Vq[0]/Ebar;  // this is very makeshift
 
 	// gauss laguerre (a = 2)
-	return detJ * pbar * energy_unit * exp(pbar) / (exp(Ebar+heat-b*(muBp/Tp+dalphaX)) + a);
+	return detJ * pbar * energy_unit * exp(pbar) / (exp(Ebar-b*muBp/Tp) + a);
 
 }
 
@@ -193,9 +183,9 @@ double modTxx_int(double xphi, double costheta, double pbar, double ** A, double
 	{
 		for(int k = 0; k < n; k++)
 		{
-			p_unit[i] += A[i][k]*unit_vec[k] - 0.0*Vq[i]*Vq[k]*unit_vec[k];
+			p_unit[i] += A[i][k]*unit_vec[k];
 		}
-		//p_unit[i] += (b*(T/Tp)*Va[i] - Vq[i]*Ebar)/pbar;
+		p_unit[i] += (b*(T/Tp)*Va[i] - Vq[i]*Ebar)/pbar;
 		//p_unit[i] += b*(T/Tp)*Va[i]/pbar;
 	}
 
@@ -210,24 +200,24 @@ double modTxx_int(double xphi, double costheta, double pbar, double ** A, double
 
 	double px_unit = p_unit[0];
 
-	double detJ = 1.0 - 0.0*Vq[0]*Vq[0] - pbar*unit_vec[0]*Vq[0]/Ebar;  // this is very makeshift
+	double detJ = 1.0 - pbar*unit_vec[0]*Vq[0]/Ebar;  // this is very makeshift
 
-	detJ = 1.0;
+	//detJ = 1.0;
 
-	double heat = 0.0;
-	for(int i = 0; i < n; i++) heat += Vq[i]*unit_vec[i]*pbar;
+	//double heat = 0.0;
+	//for(int i = 0; i < n; i++) heat += Vq[i]*unit_vec[i]*pbar;
 	//for(int i = 0; i < n; i++) heat += Vq[i]*p_unit[i]*pbar;
 
 	//double detJ = 1.0 / (1.0 + px_unit * Vq[0] / energy_unit);
 
-	double dalphaX = 0.0;
-	for(int i = 0; i < n; i++) dalphaX += unit_vec[i]*Va[i]*pbar/Ebar;
+	//double dalphaX = 0.0;
+	//for(int i = 0; i < n; i++) dalphaX += unit_vec[i]*Va[i]*pbar/Ebar;
 	//for(int i = 0; i < n; i++) dalphaX += p_unit[i]*Va[i] / energy_unit;  // this could affect renormalization of particle density
 	//for(int i = 0; i < n; i++) dalphaX += p_unit[i]*Va[i] * pbar/ Ebar;
 	//for(int i = 0; i < n; i++) dalphaX += unit_vec[i]*Va[i]/energy_unit;
 
 	// gauss laguerre (a = 2)
-	return detJ * pbar * px_unit * px_unit / energy_unit * exp(pbar) / (exp(Ebar+heat-b*(muBp/Tp+dalphaX)) + a);
+	return detJ * pbar * px_unit * px_unit / energy_unit * exp(pbar) / (exp(Ebar-b*muBp/Tp) + a);
 }
 
 
@@ -245,10 +235,9 @@ double modTyy_int(double xphi, double costheta, double pbar, double **A, double 
 	{
 		for(int k = 0; k < n; k++)
 		{
-			p_unit[i] += A[i][k]*unit_vec[k] - 0.0*Vq[i]*Vq[k]*unit_vec[k];
+			p_unit[i] += A[i][k]*unit_vec[k];
 		}
-		//p_unit[i] += (b*(T/Tp)*Va[i] - Vq[i]*Ebar)/pbar;
-		//p_unit[i] += b*(T/Tp)*Va[i]/pbar;
+		p_unit[i] += (b*(T/Tp)*Va[i] - Vq[i]*Ebar)/pbar;
 	}
 
 	double energy_unit = (mbar*mbar) / (pbar*pbar);
@@ -257,19 +246,10 @@ double modTyy_int(double xphi, double costheta, double pbar, double **A, double 
 
 	double py_unit = p_unit[1];
 
-	double detJ = 1.0 - 0.0*Vq[0]*Vq[0] - pbar*unit_vec[0]*Vq[0]/Ebar;  // this is very makeshift
-
-	detJ = 1.0;
-
-	double heat = 0.0;
-	//for(int i = 0; i < n; i++) heat += Vq[i]*unit_vec[i]*pbar;
-	for(int i = 0; i < n; i++) heat += Vq[i]*p_unit[i]*pbar;
-
-	double dalphaX = 0.0;
-	for(int i = 0; i < n; i++) dalphaX += unit_vec[i]*Va[i]*pbar/Ebar;
+	double detJ = 1.0 - pbar*unit_vec[0]*Vq[0]/Ebar;  // this is very makeshift
 
 	// gauss laguerre (a = 2)
-	return detJ * pbar * py_unit * py_unit / energy_unit * exp(pbar) / (exp(Ebar+heat-b*(muBp/Tp+dalphaX)) + a);
+	return detJ * pbar * py_unit * py_unit / energy_unit * exp(pbar) / (exp(Ebar-b*muBp/Tp) + a);
 }
 
 
@@ -287,10 +267,9 @@ double modTzz_int(double xphi, double costheta, double pbar, double **A, double 
 	{
 		for(int k = 0; k < n; k++)
 		{
-			p_unit[i] += A[i][k]*unit_vec[k] - 0.0*Vq[i]*Vq[k]*unit_vec[k];
+			p_unit[i] += A[i][k]*unit_vec[k];
 		}
-		//p_unit[i] += (b*(T/Tp)*Va[i] - Vq[i]*Ebar)/pbar;
-		//p_unit[i] += b*(T/Tp)*Va[i]/pbar;
+		p_unit[i] += (b*(T/Tp)*Va[i] - Vq[i]*Ebar)/pbar;
 	}
 
 	double energy_unit = (mbar*mbar) / (pbar*pbar);
@@ -299,19 +278,10 @@ double modTzz_int(double xphi, double costheta, double pbar, double **A, double 
 
 	double pz_unit = p_unit[2];
 
-	double detJ = 1.0 - 0.0*Vq[0]*Vq[0] - pbar*unit_vec[0]*Vq[0]/Ebar;  // this is very makeshift
-
-	detJ = 1.0;
-
-	double heat = 0.0;
-	//for(int i = 0; i < n; i++) heat += Vq[i]*unit_vec[i]*pbar;
-	for(int i = 0; i < n; i++) heat += Vq[i]*p_unit[i]*pbar;
-
-	double dalphaX = 0.0;
-	for(int i = 0; i < n; i++) dalphaX += unit_vec[i]*Va[i]*pbar/Ebar;
+	double detJ = 1.0 - pbar*unit_vec[0]*Vq[0]/Ebar;  // this is very makeshift
 
 	// gauss laguerre (a = 2)
-	return detJ * pbar * pz_unit * pz_unit / energy_unit * exp(pbar) / (exp(Ebar+heat-b*(muBp/Tp+dalphaX)) + a);
+	return detJ * pbar * pz_unit * pz_unit / energy_unit * exp(pbar) / (exp(Ebar-b*muBp/Tp) + a);
 }
 
 
@@ -330,10 +300,9 @@ double modTxy_int(double xphi, double costheta, double pbar, double **A, double 
 	{
 		for(int k = 0; k < n; k++)
 		{
-			p_unit[i] += A[i][k]*unit_vec[k] - 0.0*Vq[i]*Vq[k]*unit_vec[k];
+			p_unit[i] += A[i][k]*unit_vec[k];
 		}
-		//p_unit[i] += (b*(T/Tp)*Va[i] - Vq[i]*Ebar)/pbar;
-		//p_unit[i] += b*(T/Tp)*Va[i]/pbar;
+		p_unit[i] += (b*(T/Tp)*Va[i] - Vq[i]*Ebar)/pbar;
 	}
 	double energy_unit = (mbar*mbar) / (pbar*pbar);
 	for(int i = 0; i < n; i++) energy_unit += p_unit[i] * p_unit[i];
@@ -342,19 +311,10 @@ double modTxy_int(double xphi, double costheta, double pbar, double **A, double 
 	double px_unit = p_unit[0];
 	double py_unit = p_unit[1];
 
-	double detJ = 1.0 - 0.0*Vq[0]*Vq[0] - pbar*unit_vec[0]*Vq[0]/Ebar;  // this is very makeshift
-
-	detJ = 1.0;
-
-	double heat = 0.0;
-	//for(int i = 0; i < n; i++) heat += Vq[i]*unit_vec[i]*pbar;
-	for(int i = 0; i < n; i++) heat += Vq[i]*p_unit[i]*pbar;
-
-	double dalphaX = 0.0;
-	for(int i = 0; i < n; i++) dalphaX += unit_vec[i]*Va[i]*pbar/Ebar;
+	double detJ = 1.0 - pbar*unit_vec[0]*Vq[0]/Ebar;  // this is very makeshift
 
 	// gauss laguerre (a = 2)
-	return detJ * pbar * px_unit * py_unit / energy_unit * exp(pbar) / (exp(Ebar+heat-b*(muBp/Tp+dalphaX)) + a);
+	return detJ * pbar * px_unit * py_unit / energy_unit * exp(pbar) / (exp(Ebar-b*muBp/Tp) + a);
 }
 
 
@@ -372,10 +332,9 @@ double modTxz_int(double xphi, double costheta, double pbar, double **A, double 
 	{
 		for(int k = 0; k < n; k++)
 		{
-			p_unit[i] += A[i][k]*unit_vec[k] - 0.0*Vq[i]*Vq[k]*unit_vec[k];
+			p_unit[i] += A[i][k]*unit_vec[k];
 		}
-		//p_unit[i] += (b*(T/Tp)*Va[i] - Vq[i]*Ebar)/pbar;
-		//p_unit[i] += b*(T/Tp)*Va[i]/pbar;
+		p_unit[i] += (b*(T/Tp)*Va[i] - Vq[i]*Ebar)/pbar;
 	}
 	double energy_unit = (mbar*mbar) / (pbar*pbar);
 	for(int i = 0; i < n; i++) energy_unit += p_unit[i] * p_unit[i];
@@ -384,19 +343,10 @@ double modTxz_int(double xphi, double costheta, double pbar, double **A, double 
 	double px_unit = p_unit[0];
 	double pz_unit = p_unit[2];
 
-	double detJ = 1.0 - 0.0*Vq[0]*Vq[0] - pbar*unit_vec[0]*Vq[0]/Ebar;  // this is very makeshift
-
-	detJ = 1.0;
-
-	double heat = 0.0;
-	//for(int i = 0; i < n; i++) heat += Vq[i]*unit_vec[i]*pbar;
-	for(int i = 0; i < n; i++) heat += Vq[i]*p_unit[i]*pbar;
-
-	double dalphaX = 0.0;
-	for(int i = 0; i < n; i++) dalphaX += unit_vec[i]*Va[i]*pbar/Ebar;
+	double detJ = 1.0 - pbar*unit_vec[0]*Vq[0]/Ebar;  // this is very makeshift
 
 	// gauss laguerre (a = 2)
-	return detJ * pbar * px_unit * pz_unit / energy_unit * exp(pbar) / (exp(Ebar+heat-b*(muBp/Tp+dalphaX)) + a);
+	return detJ * pbar * px_unit * pz_unit / energy_unit * exp(pbar) / (exp(Ebar-b*muBp/Tp) + a);
 }
 
 
@@ -414,10 +364,9 @@ double modTyz_int(double xphi, double costheta, double pbar, double **A, double 
 	{
 		for(int k = 0; k < n; k++)
 		{
-			p_unit[i] += A[i][k]*unit_vec[k] - 0.0*Vq[i]*Vq[k]*unit_vec[k];
+			p_unit[i] += A[i][k]*unit_vec[k];
 		}
-		//p_unit[i] += (b*(T/Tp)*Va[i] - Vq[i]*Ebar)/pbar;
-		//p_unit[i] += b*(T/Tp)*Va[i]/pbar;
+		p_unit[i] += (b*(T/Tp)*Va[i] - Vq[i]*Ebar)/pbar;
 	}
 	double energy_unit = (mbar*mbar) / (pbar*pbar);
 	for(int i = 0; i < n; i++) energy_unit += p_unit[i] * p_unit[i];
@@ -426,19 +375,10 @@ double modTyz_int(double xphi, double costheta, double pbar, double **A, double 
 	double py_unit = p_unit[1];
 	double pz_unit = p_unit[2];
 
-	double detJ = 1.0 - 0.0*Vq[0]*Vq[0] - pbar*unit_vec[0]*Vq[0]/Ebar;  // this is very makeshift
-
-	detJ = 1.0;
-
-	double heat = 0.0;
-	//for(int i = 0; i < n; i++) heat += Vq[i]*unit_vec[i]*pbar;
-	for(int i = 0; i < n; i++) heat += Vq[i]*p_unit[i]*pbar;
-
-	double dalphaX = 0.0;
-	for(int i = 0; i < n; i++) dalphaX += unit_vec[i]*Va[i]*pbar/Ebar;
+	double detJ = 1.0 - pbar*unit_vec[0]*Vq[0]/Ebar;  // this is very makeshift
 
 	// gauss laguerre (a = 2)
-	return detJ * pbar * py_unit * pz_unit / energy_unit * exp(pbar) / (exp(Ebar+heat-b*(muBp/Tp+dalphaX)) + a);
+	return detJ * pbar * py_unit * pz_unit / energy_unit * exp(pbar) / (exp(Ebar-b*muBp/Tp) + a);
 }
 
 
@@ -456,10 +396,9 @@ double modTtx_int(double xphi, double costheta, double pbar, double **A, double 
 	{
 		for(int k = 0; k < n; k++)
 		{
-			p_unit[i] += A[i][k]*unit_vec[k] - 0.0*Vq[i]*Vq[k]*unit_vec[k];
+			p_unit[i] += A[i][k]*unit_vec[k];
 		}
-		//p_unit[i] += (b*(T/Tp)*Va[i] - Vq[i]*Ebar)/pbar;
-		//p_unit[i] += b*(T/Tp)*Va[i]/pbar;
+		p_unit[i] += (b*(T/Tp)*Va[i] - Vq[i]*Ebar)/pbar;
 	}
 
 	double energy_unit = (mbar*mbar) / (pbar*pbar);
@@ -468,19 +407,10 @@ double modTtx_int(double xphi, double costheta, double pbar, double **A, double 
 
 	double px_unit = p_unit[0];
 
-	double detJ = 1.0 - 0.0*Vq[0]*Vq[0] - pbar*unit_vec[0]*Vq[0]/Ebar;  // this is very makeshift
-
-	detJ = 1.0;
-
-	double heat = 0.0;
-	//for(int i = 0; i < n; i++) heat += Vq[i]*unit_vec[i]*pbar;
-	for(int i = 0; i < n; i++) heat += Vq[i]*p_unit[i]*pbar;
-
-	double dalphaX = 0.0;
-	for(int i = 0; i < n; i++) dalphaX += unit_vec[i]*Va[i]*pbar/Ebar;
+	double detJ = 1.0 - pbar*unit_vec[0]*Vq[0]/Ebar;  // this is very makeshift
 
 	// gauss laguerre (a = 2)
-	return detJ * pbar * px_unit * exp(pbar) / (exp(Ebar+heat-b*(muBp/Tp+dalphaX)) + a);
+	return detJ * pbar * px_unit * exp(pbar) / (exp(Ebar-b*muBp/Tp) + a);
 }
 
 
@@ -498,10 +428,9 @@ double modTty_int(double xphi, double costheta, double pbar, double **A, double 
 	{
 		for(int k = 0; k < n; k++)
 		{
-			p_unit[i] += A[i][k]*unit_vec[k] - 0.0*Vq[i]*Vq[k]*unit_vec[k];
+			p_unit[i] += A[i][k]*unit_vec[k];
 		}
-		//p_unit[i] += (b*(T/Tp)*Va[i] - Vq[i]*Ebar)/pbar;
-		//p_unit[i] += b*(T/Tp)*Va[i]/pbar;
+		p_unit[i] += (b*(T/Tp)*Va[i] - Vq[i]*Ebar)/pbar;
 	}
 
 	double energy_unit = (mbar*mbar) / (pbar*pbar);
@@ -510,19 +439,10 @@ double modTty_int(double xphi, double costheta, double pbar, double **A, double 
 
 	double py_unit = p_unit[1];
 
-	double detJ = 1.0 - 0.0*Vq[0]*Vq[0] - pbar*unit_vec[0]*Vq[0]/Ebar;  // this is very makeshift
-
-	detJ = 1.0;
-
-	double heat = 0.0;
-	//for(int i = 0; i < n; i++) heat += Vq[i]*unit_vec[i]*pbar;
-	for(int i = 0; i < n; i++) heat += Vq[i]*p_unit[i]*pbar;
-
-	double dalphaX = 0.0;
-	for(int i = 0; i < n; i++) dalphaX += unit_vec[i]*Va[i]*pbar/Ebar;
+	double detJ = 1.0 - pbar*unit_vec[0]*Vq[0]/Ebar;  // this is very makeshift
 
 	// gauss laguerre (a = 2)
-	return detJ * pbar * py_unit * exp(pbar) / (exp(Ebar+heat-b*(muBp/Tp+dalphaX)) + a);
+	return detJ * pbar * py_unit * exp(pbar) / (exp(Ebar-b*muBp/Tp) + a);
 }
 
 
@@ -540,10 +460,9 @@ double modTtz_int(double xphi, double costheta, double pbar, double **A, double 
 	{
 		for(int k = 0; k < n; k++)
 		{
-			p_unit[i] += A[i][k]*unit_vec[k] - 0.0*Vq[i]*Vq[k]*unit_vec[k];
+			p_unit[i] += A[i][k]*unit_vec[k];
 		}
-		//p_unit[i] += (b*(T/Tp)*Va[i] - Vq[i]*Ebar)/pbar;
-		//p_unit[i] += b*(T/Tp)*Va[i]/pbar;
+		p_unit[i] += (b*(T/Tp)*Va[i] - Vq[i]*Ebar)/pbar;
 	}
 
 	double energy_unit = (mbar*mbar) / (pbar*pbar);
@@ -552,19 +471,10 @@ double modTtz_int(double xphi, double costheta, double pbar, double **A, double 
 
 	double pz_unit = p_unit[2];
 
-	double detJ = 1.0 - 0.0*Vq[0]*Vq[0] - pbar*unit_vec[0]*Vq[0]/Ebar;  // this is very makeshift
-
-	detJ = 1.0;
-
-	double heat = 0.0;
-	//for(int i = 0; i < n; i++) heat += Vq[i]*unit_vec[i]*pbar;
-	for(int i = 0; i < n; i++) heat += Vq[i]*p_unit[i]*pbar;
-
-	double dalphaX = 0.0;
-	for(int i = 0; i < n; i++) dalphaX += unit_vec[i]*Va[i]*pbar/Ebar;
+	double detJ = 1.0 - pbar*unit_vec[0]*Vq[0]/Ebar;  // this is very makeshift
 
 	// gauss laguerre (a = 2)
-	return detJ * pbar * pz_unit * exp(pbar) / (exp(Ebar+heat-b*(muBp/Tp+dalphaX)) + a);
+	return detJ * pbar * pz_unit * exp(pbar) / (exp(Ebar-b*muBp/Tp) + a);
 }
 
 
@@ -590,10 +500,9 @@ double modVx_int(double xphi, double costheta, double pbar, double **A, double *
 	{
 		for(int k = 0; k < n; k++)
 		{
-			p_unit[i] += A[i][k]*unit_vec[k] - 0.0*Vq[i]*Vq[k]*unit_vec[k];
+			p_unit[i] += A[i][k]*unit_vec[k];
 		}
-		//p_unit[i] += (b*(T/Tp)*Va[i] - Vq[i]*Ebar)/pbar;
-		//p_unit[i] += b*(T/Tp)*Va[i]/pbar;
+		p_unit[i] += (b*(T/Tp)*Va[i] - Vq[i]*Ebar)/pbar;
 	}
 
 	double energy_unit = (mbar*mbar) / (pbar*pbar);
@@ -602,19 +511,10 @@ double modVx_int(double xphi, double costheta, double pbar, double **A, double *
 
 	double px_unit = p_unit[0];
 
-	double detJ = 1.0 - 0.0*Vq[0]*Vq[0] - pbar*unit_vec[0]*Vq[0]/Ebar;  // this is very makeshift
-
-	detJ = 1.0;
-
-	double heat = 0.0;
-	//for(int i = 0; i < n; i++) heat += Vq[i]*unit_vec[i]*pbar;
-	for(int i = 0; i < n; i++) heat += Vq[i]*p_unit[i]*pbar;
-
-	double dalphaX = 0.0;
-	for(int i = 0; i < n; i++) dalphaX += unit_vec[i]*Va[i]*pbar/Ebar;
+	double detJ = 1.0 - pbar*unit_vec[0]*Vq[0]/Ebar;  // this is very makeshift
 
 	// gauss laguerre (a = 1)
-	return detJ * b * pbar * px_unit / energy_unit * exp(pbar) / (exp(Ebar+heat-b*(muBp/Tp+dalphaX)) + a);
+	return detJ * b * pbar * px_unit / energy_unit * exp(pbar) / (exp(Ebar-b*muBp/Tp) + a);
 }
 
 
@@ -632,10 +532,9 @@ double modVy_int(double xphi, double costheta, double pbar, double **A, double *
 	{
 		for(int k = 0; k < n; k++)
 		{
-			p_unit[i] += A[i][k]*unit_vec[k] - 0.0*Vq[i]*Vq[k]*unit_vec[k];
+			p_unit[i] += A[i][k]*unit_vec[k];
 		}
-		//p_unit[i] += (b*(T/Tp)*Va[i] - Vq[i]*Ebar)/pbar;
-		//p_unit[i] += b*(T/Tp)*Va[i]/pbar;
+		p_unit[i] += (b*(T/Tp)*Va[i] - Vq[i]*Ebar)/pbar;
 	}
 
 	double energy_unit = (mbar*mbar) / (pbar*pbar);
@@ -644,19 +543,10 @@ double modVy_int(double xphi, double costheta, double pbar, double **A, double *
 
 	double py_unit = p_unit[1];
 
-	double detJ = 1.0 - 0.0*Vq[0]*Vq[0] - pbar*unit_vec[0]*Vq[0]/Ebar;  // this is very makeshift
-
-	detJ = 1.0;
-
-	double heat = 0.0;
-	//for(int i = 0; i < n; i++) heat += Vq[i]*unit_vec[i]*pbar;
-	for(int i = 0; i < n; i++) heat += Vq[i]*p_unit[i]*pbar;
-
-	double dalphaX = 0.0;
-	for(int i = 0; i < n; i++) dalphaX += unit_vec[i]*Va[i]*pbar/Ebar;
+	double detJ = 1.0 - pbar*unit_vec[0]*Vq[0]/Ebar;  // this is very makeshift
 
 	// gauss laguerre (a = 1)
-	return detJ * b * pbar * py_unit / energy_unit * exp(pbar) / (exp(Ebar+heat-b*(muBp/Tp+dalphaX)) + a);
+	return detJ * b * pbar * py_unit / energy_unit * exp(pbar) / (exp(Ebar-b*muBp/Tp) + a);
 }
 
 
@@ -674,11 +564,9 @@ double modVz_int(double xphi, double costheta, double pbar, double **A, double *
 	{
 		for(int k = 0; k < n; k++)
 		{
-			p_unit[i] += A[i][k]*unit_vec[k] - 0.0*Vq[i]*Vq[k]*unit_vec[k];
+			p_unit[i] += A[i][k]*unit_vec[k];
 		}
-		//p_unit[i] += (b*(T/Tp)*Va[i] - Vq[i]*Ebar)/pbar;
-		//p_unit[i] += b*(T/Tp)*Va[i]/pbar;
-
+		p_unit[i] += (b*(T/Tp)*Va[i] - Vq[i]*Ebar)/pbar;
 	}
 	double energy_unit = (mbar*mbar) / (pbar*pbar);
 	for(int i = 0; i < n; i++) energy_unit += p_unit[i] * p_unit[i];
@@ -686,19 +574,10 @@ double modVz_int(double xphi, double costheta, double pbar, double **A, double *
 
 	double pz_unit = p_unit[2];
 
-	double detJ = 1.0 - 0.0*Vq[0]*Vq[0] - pbar*unit_vec[0]*Vq[0]/Ebar;  // this is very makeshift
-
-	detJ = 1.0;
-
-	double heat = 0.0;
-	//for(int i = 0; i < n; i++) heat += Vq[i]*unit_vec[i]*pbar;
-	for(int i = 0; i < n; i++) heat += Vq[i]*p_unit[i]*pbar;
-
-	double dalphaX = 0.0;
-	for(int i = 0; i < n; i++) dalphaX += unit_vec[i]*Va[i]*pbar/Ebar;
+	double detJ = 1.0 - pbar*unit_vec[0]*Vq[0]/Ebar;  // this is very makeshift
 
 	// gauss laguerre (a = 1)
-	return detJ * b * pbar * pz_unit / energy_unit * exp(pbar) / (exp(Ebar+heat-b*(muBp/Tp+dalphaX)) + a);
+	return detJ * b * pbar * pz_unit / energy_unit * exp(pbar) / (exp(Ebar-b*muBp/Tp) + a);
 }
 
 
@@ -720,30 +599,19 @@ double modn_int(double xphi, double costheta, double pbar, double **A, double * 
 	{
 		for(int k = 0; k < n; k++)
 		{
-			p_unit[i] += A[i][k]*unit_vec[k] - 0.0*Vq[i]*Vq[k]*unit_vec[k];
+			p_unit[i] += A[i][k]*unit_vec[k];
 		}
-		//p_unit[i] += (b*(T/Tp)*Va[i] - Vq[i]*Ebar)/pbar;
-		//p_unit[i] += b*(T/Tp)*Va[i]/pbar;
+		p_unit[i] += (b*(T/Tp)*Va[i] - Vq[i]*Ebar)/pbar;
 	}
 
 	double energy_unit = (mbar*mbar) / (pbar*pbar);
 	for(int i = 0; i < n; i++) energy_unit += p_unit[i] * p_unit[i];
 	energy_unit = sqrt(energy_unit);
 
-	double detJ = 1.0 - 0.0*Vq[0]*Vq[0] - pbar*unit_vec[0]*Vq[0]/Ebar;  // this is very makeshift
-
-
-	detJ = 1.0;
-
-	double heat = 0.0;
-	//for(int i = 0; i < n; i++) heat += Vq[i]*unit_vec[i]*pbar;
-	for(int i = 0; i < n; i++) heat += Vq[i]*p_unit[i]*pbar;
-
-	double dalphaX = 0.0;
-	for(int i = 0; i < n; i++) dalphaX += unit_vec[i]*Va[i]*pbar/Ebar;
+	double detJ = 1.0 - pbar*unit_vec[0]*Vq[0]/Ebar;  // this is very makeshift
 
 	// gauss laguerre (a = 1)
-	return detJ * pbar * exp(pbar) / (exp(Ebar+heat-b*(muBp/Tp+dalphaX)) + a);
+	return detJ * pbar * exp(pbar) / (exp(Ebar-b*muBp/Tp) + a);
 }
 
 

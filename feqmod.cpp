@@ -220,7 +220,7 @@ int main()
 	double b0 = 0.1583 / GEV_TO_INVERSE_FM;
 
 	// thermodynamic variables
-	double T = 0.120 * GEV_TO_INVERSE_FM;         // temperature in fm^-1
+	double T = 0.1672 * GEV_TO_INVERSE_FM;         // temperature in fm^-1
 	double muB = sqrt((T0 - T)/b0);               // baryon chemical potential in fm^-1
 
 	double aB = muB/T;						      // baryon chemical potential over temperature
@@ -257,30 +257,7 @@ int main()
 	cout << "Pressure = " << P << " fm^-4" << endl;
 	cout << "nB = " << nB << " fm^-3" << endl;
 
-	// Initialize viscous input
-	double Pi = - 0.0 * P;
-	double pixx = 0.5 * P;
-	double piyy = - 0.5 * P;
-	double pixy = 0.0 * P;
-	double pixz = 0.0 * P;
-	double piyz = 0.0 * P;
-	double pizz = - (pixx + piyy);
-	double Vx = 0.0 * nB;
-	double Vy = 0.0 * nB;
-	double Vz = 0.0 * nB;
-
-
-	// Initialize stress energy tensor
-	double Txx = P + pixx + Pi;
-	double Tyy = P + piyy + Pi;
-	double Tzz = P + pizz + Pi;
-	double Txy = pixy;
-	double Txz = pixz;
-	double Tyz = piyz;
-	double Ttx = 0.0;
-	double Tty = 0.0;
-	double Ttz = 0.0;
-
+	cout << "nB*T/(E+P) = " << nB*T/(E+P) << endl;
 
 
 	// Compute dmuB, dT, betaPi, betapi, betaV
@@ -319,16 +296,51 @@ int main()
 	double Bpi = J32/T;
 
 
+
+
+	// Initialize viscous input
+	double Pi = - 0.0 * P;
+	double pixx = 0.0 * P;
+	double piyy = - 0.0 * P;
+	double pixy = 0.0 * P;
+	double pixz = 0.0 * P;
+	double piyz = 0.0 * P;
+	double pizz = - (pixx + piyy);
+
+
+	// Initialize stress energy tensor
+	double Txx = P + pixx + Pi;
+	double Tyy = P + piyy + Pi;
+	double Tzz = P + pizz + Pi;
+	double Txy = pixy;
+	double Txz = pixz;
+	double Tyz = piyz;
+	double Ttx = 0.0;
+	double Tty = 0.0;
+	double Ttz = 0.0;
+
+	double Vx = 0.5 * nB;
+	double Vy = 0.0 * nB;
+	double Vz = 0.0 * nB;
+
+	cout << "Z11 = " << Z11 << " fm^-3" << endl;
+	cout << "nB^2 T / (E+P) = " << nB*nB*T/(E+P) << " fm^-3" << endl;
+
+
 	double dT = Pi*F/BPi;
 	double dmuB = Pi*G/BPi;
 
 	double Tp = T + dT;
 	double muBp = muB + dmuB;  // modified temperature akd baryon chemical potential
 
-
+	cout << "BV = " << BV << " fm^-3" << endl;
+	cout << "BV(E+P)/(nB*T) = " << (BV*(E+P)) / (nB*T) << endl;
+	cout << "3 BPi = " << 3.0*BPi << endl;
+	cout << "2 Bpi = " << 2.0*Bpi << endl;
+	cout << "Pressure = " << P << endl;
+	cout << "Enthalpy density = " << E+P << endl;
 	cout << "dT = " << dT << endl;
 	cout << "dmuB = " << dmuB << endl;
-	cout << "betaPi = " << BPi << endl;
 	cout << "dnB = " << dmuB*Z10/T + dT*N20/(T*T) - muB*Z10*dT/(T*T) + Pi*nB/BPi << endl;
 	cout << "dE = " << dmuB*N20/T + dT*J30/(T*T) - muB*N20*dT/(T*T) + Pi*(E+P)/BPi << endl;
 	cout << "dPi = " << dmuB*nB + dT*(E+P-muB*nB)/T + 5.0*Pi*J32/(3.0*T*BPi) - Pi << endl;
@@ -443,10 +455,10 @@ int main()
 
 		// neq + Pi/(BPi*T)*(F*J20/T + J21)
 
-		//modn = factN * dof * GaussMod3D(modn_int, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootN, pbar_weightN, angle_pts, angle_pts, gla_pts, A, Vq, Va, n, mbarp, T, Tp, muBp, bk, ak);
+		modn = factN * dof * GaussMod3D(modn_int, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootN, pbar_weightN, angle_pts, angle_pts, gla_pts, A, Vq, Va, n, mbarp, T, Tp, muBp, bk, ak);
 
 
-		modn = 4.0 * dof * factN * Gauss1D(neq_int, pbar_rootN, pbar_weightN, gla_pts, mbarp, Tp, muBp, bk, ak);
+		//modn = 4.0 * dof * factN * Gauss1D(neq_int, pbar_rootN, pbar_weightN, gla_pts, mbarp, Tp, muBp, bk, ak);
 
 		renormalize[k] = nlin / modn;
 
@@ -511,8 +523,8 @@ int main()
 	double modbulk = (modTxx + modTyy + modTzz)/3.0 - P;
 
 
-	//modVx += bk2_J11 * V_alpha[0];
-	//modTtx += nBeq * T * V_alpha[0];  // add truncated V_alpha correction
+	//modVx += Z11 * Va[0];
+	//modTtx += nB * T * Va[0];  // add truncated V_alpha correction
 
 
 	// print input/output results for comparison

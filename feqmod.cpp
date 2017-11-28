@@ -214,17 +214,20 @@ int main()
 	//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
-	// chemical freezeout T-muB data fit (Beccatini 2006 paper)
-	// T = T0 - b0 * muB^2
-	double T0 = 0.1675 * GEV_TO_INVERSE_FM;       // RHIC + SPS data
-	double b0 = 0.1583 / GEV_TO_INVERSE_FM;
+	// Chemical freezeout Data fit (Andronic 2017)
+
+	double T_limit = 0.1584 * GEV_TO_INVERSE_FM;
+	double muB_limit = 1.3075 * GEV_TO_INVERSE_FM;
+
+	double sqrt_s = 2.7;                               // collision energy
 
 	// thermodynamic variables
-	double T = 0.1672 * GEV_TO_INVERSE_FM;         // temperature in fm^-1
-	double muB = sqrt((T0 - T)/b0);               // baryon chemical potential in fm^-1
+	double T = T_limit/(1.0+exp(2.60-log(sqrt_s)/0.45));   // temperature in fm^-1
+	double muB = muB_limit/(1.0+0.288*sqrt_s);            // baryon chemical potential in fm^-1
 
-	double aB = muB/T;						      // baryon chemical potential over temperature
+	//double aB = muB/T;
 
+	cout << "T = " << T / GEV_TO_INVERSE_FM << " GeV" << endl;
 	cout << "muB = " << muB / GEV_TO_INVERSE_FM << " GeV" << endl;
 
 	cout << "muB = " << muB << " fm^-1" << endl;

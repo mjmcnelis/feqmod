@@ -214,7 +214,7 @@ int main()
 	//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
-	// Chemical freezeout Data fit (Andronic 2017)
+	// Chemical freezeout data (Andronic 2017)
 
 	double T_limit = 0.1584 * GEV_TO_INVERSE_FM;
 	double muB_limit = 1.3075 * GEV_TO_INVERSE_FM;
@@ -299,8 +299,8 @@ int main()
 
 	// Initialize viscous input
 	double Pi = - 0.0 * P;
-	double pixx = 0.5 * P;
-	double piyy = - 0.5 * P;
+	double pixx = 0.0 * P;
+	double piyy = - 0.0 * P;
 	double pixy = 0.0 * P;
 	double pixz = 0.0 * P;
 	double piyz = 0.0 * P;
@@ -318,7 +318,7 @@ int main()
 	double Tty = 0.0;
 	double Ttz = 0.0;
 
-	double Vx = 0.0 * nB / aB;
+	double Vx = 0.5 * nB / aB;
 	double Vy = 0.0 * nB / aB;
 	double Vz = 0.0 * nB / aB;
 
@@ -334,13 +334,16 @@ int main()
 
 	// cout << "BV = " << BV << endl;
 	// cout << "nB^2 T / (E+P) = " << nB*nB*T/(E+P) << endl;
-	// cout << "nB/aB = " << nB/aB << endl;
+	cout << "nB/aB = " << nB/aB << endl;
 
 	// cout << "3 BPi = " << 3.0 * BPi << endl;
 	// cout << "2 Bpi = " << 2.0 * Bpi << endl;
-	
-	// cout << "dT = " << dT << endl;
-	// cout << "dmuB = " << dmuB << endl;
+
+	cout << "T = " << T << endl;
+	cout << "muB = " << muB << endl;
+
+	cout << "dT = " << dT << endl;
+	cout << "dmuB = " << dmuB << endl;
 
 	// cout << "dnB = " << dmuB*Z10/T + dT*N20/(T*T) - muB*Z10*dT/(T*T) + Pi*nB/BPi << endl;
 	// cout << "dE = " << dmuB*N20/T + dT*J30/(T*T) - muB*N20*dT/(T*T) + Pi*(E+P)/BPi << endl;
@@ -463,13 +466,15 @@ int main()
 
 		renormalize[k] = nlin / modn;
 
+
+
 		if(nlin < 0.0)
 		{
-			printf("\nNegative linear density\n");
+			printf("\nNEGATIVE LINEAR DENSITY\n");
 		}
 		if(modn < 0.0)
 		{
-			printf("\nNegative mod density\n");
+			printf("\nNEGATIVE MOD DENSITY\n");
 		}
 	}
 
@@ -591,22 +596,25 @@ int main()
 	printf("Plots:\n\n");
 
 
-	cout << setprecision(5) << "dE/E       " << 0.0 << "\n" << "dEmod/Eeq    " << setprecision(5) << (modE / E - 1.0) << endl;
+	cout << setprecision(5) << "dE/Eeq    " << setprecision(5) << (modE / E - 1.0) << endl;
 
 	printf("\n");
 
-	cout << setprecision(5) << "Pi/P      " << bulk_in / P  << "\n" << "modPi/P   " << setprecision(5) << modbulk / P  << endl;
+	//cout << setprecision(5) << "Pi/P      " << bulk_in / P  << "\n" << "modPi/P   " << setprecision(5) << modbulk / P  << endl;
 
 	printf("\n");
 
-	cout << setprecision(5) << "piTxx/P     " << piTxx / P  << "\n" << "modpiTxx/P   " << setprecision(5) << modpiTxx / P << endl;
+	//cout << setprecision(5) << "piTxx/P     " << piTxx / P  << "\n" << "modpiTxx/P   " << setprecision(5) << modpiTxx / P << endl;
 
-	cout << setprecision(5) << "dTzz/Tzz      " << (modTzz - Tzz) / Tzz  << "\n" << endl;
+	//cout << setprecision(5) << "dTzz/Tzz      " << (modTzz - Tzz) / Tzz  << "\n" << endl;
 
-	//cout << setprecision(5) << "dTyy/Tyy      " << (modTyy - Tyy) / Tyy  << "\n" << endl;
+	cout << setprecision(5) << "dTxx/Txx      " << (modTxx - Txx) / Txx  << "\n" << endl;
+
+	cout << setprecision(5) << "modVx/(nB/aB)      " << modVx / (nB/aB)   << "\n" << endl;
+
+	cout << setprecision(5) << "modTtx      " << modTtx  << "\n" << endl;
 
 	printf("\n");
-
 
 	printf("\n\n");
 

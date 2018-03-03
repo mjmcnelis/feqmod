@@ -169,56 +169,6 @@ double modE_int(double xphi, double costheta, double pbar, double ** A, double *
 }
 
 
-double modTxx_int(double xphi, double costheta, double pbar, double ** A, double * Vq, double * Va, int n, double mbar, double T, double Tp, double muBp, double b, double a)
-{
-	double Ebar = sqrt(pbar*pbar + mbar*mbar);
-
-	double cosphi = cos(M_PI*(1.0+xphi));
-	double sinphi = sin(M_PI*(1.0+xphi));
-	double sintheta = sqrt(1.0 - costheta*costheta);
-
-	double p_unit[3] = {0.0,0.0,0.0};
-	double unit_vec[3] = {cosphi*sintheta, sinphi*sintheta, costheta};
-	for(int i = 0; i < n; i++)
-	{
-		for(int k = 0; k < n; k++)
-		{
-			p_unit[i] += A[i][k]*unit_vec[k];
-		}
-		p_unit[i] += (b*(T/Tp)*Va[i] - Vq[i]*Ebar)/pbar;
-		//p_unit[i] += b*(T/Tp)*Va[i]/pbar;
-	}
-
-	// I could take out the Va part:
-	//p_unit[0] = (pbar*unit_vec[0]+bn*Va[0] + Vq[0]*sqrt((mbar*mbar + pbar*pbar*(1.0 - unit_vec[0]*unit_vec[0]))*(1.0 - Vq[0]*Vq[0]) + (pbar*unit_vec[0]+bn*Va[0])*(pbar*unit_vec[0]+bn*Va[0])))/(pbar*(1.0 - Vq[0]*Vq[0]));
-
-	//p_unit[0] = (pbar*unit_vec[0] - Vq[0]*sqrt((mbar*mbar + pbar*pbar*(1.0 - unit_vec[0]*unit_vec[0]))*(1.0 - Vq[0]*Vq[0]) + (pbar*unit_vec[0])*(pbar*unit_vec[0])))/(pbar*(1.0 - Vq[0]*Vq[0]));
-
-	double energy_unit = (mbar*mbar) / (pbar*pbar);
-	for(int i = 0; i < n; i++) energy_unit += p_unit[i] * p_unit[i];
-	energy_unit = sqrt(energy_unit);
-
-	double px_unit = p_unit[0];
-
-	double detJ = 1.0 - pbar*unit_vec[0]*Vq[0]/Ebar;  // this is very makeshift
-
-	//detJ = 1.0;
-
-	//double heat = 0.0;
-	//for(int i = 0; i < n; i++) heat += Vq[i]*unit_vec[i]*pbar;
-	//for(int i = 0; i < n; i++) heat += Vq[i]*p_unit[i]*pbar;
-
-	//double detJ = 1.0 / (1.0 + px_unit * Vq[0] / energy_unit);
-
-	//double dalphaX = 0.0;
-	//for(int i = 0; i < n; i++) dalphaX += unit_vec[i]*Va[i]*pbar/Ebar;
-	//for(int i = 0; i < n; i++) dalphaX += p_unit[i]*Va[i] / energy_unit;  // this could affect renormalization of particle density
-	//for(int i = 0; i < n; i++) dalphaX += p_unit[i]*Va[i] * pbar/ Ebar;
-	//for(int i = 0; i < n; i++) dalphaX += unit_vec[i]*Va[i]/energy_unit;
-
-	// gauss laguerre (a = 2)
-	return detJ * pbar * px_unit * px_unit / energy_unit * exp(pbar) / (exp(Ebar-b*muBp/Tp) + a);
-}
 
 
 double modTyy_int(double xphi, double costheta, double pbar, double **A, double * Vq, double * Va, int n, double mbar, double T, double Tp, double muBp, double b, double a)
@@ -409,8 +359,11 @@ double modTtx_int(double xphi, double costheta, double pbar, double **A, double 
 
 	double detJ = 1.0 - pbar*unit_vec[0]*Vq[0]/Ebar;  // this is very makeshift
 
+	double dalphaX = 0.0;
+	//for(int i = 0; i < n; i++) dalphaX += unit_vec[i]*Va[i]*pbar/Ebar;
+
 	// gauss laguerre (a = 2)
-	return detJ * pbar * px_unit * exp(pbar) / (exp(Ebar-b*muBp/Tp) + a);
+	return detJ * pbar * px_unit * exp(pbar) / (exp(Ebar-b*(muBp/Tp+dalphaX)) + a);
 }
 
 
@@ -485,37 +438,7 @@ double modTtz_int(double xphi, double costheta, double pbar, double **A, double 
 // for baryon diffusion
 
 
-double modVx_int(double xphi, double costheta, double pbar, double **A, double * Vq, double * Va, int n, double mbar, double T, double Tp, double muBp, double b, double a)
-{
-	double Ebar = sqrt(pbar*pbar + mbar*mbar);
 
-	double cosphi = cos(M_PI*(1.0+xphi));
-	double sinphi = sin(M_PI*(1.0+xphi));
-	double sintheta = sqrt(1.0 - costheta*costheta);
-
-	double p_unit[3] = {0.0,0.0,0.0};
-	double unit_vec[3] = {cosphi*sintheta, sinphi*sintheta, costheta};
-
-	for(int i = 0; i < n; i++)
-	{
-		for(int k = 0; k < n; k++)
-		{
-			p_unit[i] += A[i][k]*unit_vec[k];
-		}
-		p_unit[i] += (b*(T/Tp)*Va[i] - Vq[i]*Ebar)/pbar;
-	}
-
-	double energy_unit = (mbar*mbar) / (pbar*pbar);
-	for(int i = 0; i < n; i++) energy_unit += p_unit[i] * p_unit[i];
-	energy_unit = sqrt(energy_unit);
-
-	double px_unit = p_unit[0];
-
-	double detJ = 1.0 - pbar*unit_vec[0]*Vq[0]/Ebar;  // this is very makeshift
-
-	// gauss laguerre (a = 1)
-	return detJ * b * pbar * px_unit / energy_unit * exp(pbar) / (exp(Ebar-b*muBp/Tp) + a);
-}
 
 
 double modVy_int(double xphi, double costheta, double pbar, double **A, double * Vq, double * Va, int n, double mbar, double T, double Tp, double muBp, double b, double a)
@@ -610,9 +533,98 @@ double modn_int(double xphi, double costheta, double pbar, double **A, double * 
 
 	double detJ = 1.0 - pbar*unit_vec[0]*Vq[0]/Ebar;  // this is very makeshift
 
+	double dalphaX = 0.0;
+	//for(int i = 0; i < n; i++) dalphaX += unit_vec[i]*Va[i]*pbar/Ebar;
+
 	// gauss laguerre (a = 1)
-	return detJ * pbar * exp(pbar) / (exp(Ebar-b*muBp/Tp) + a);
+	return detJ * pbar * exp(pbar) / (exp(Ebar-b*(muBp/Tp+dalphaX)) + a);
 }
 
+double modTxx_int(double xphi, double costheta, double pbar, double ** A, double * Vq, double * Va, int n, double mbar, double T, double Tp, double muBp, double b, double a)
+{
+	double Ebar = sqrt(pbar*pbar + mbar*mbar);
+
+	double cosphi = cos(M_PI*(1.0+xphi));
+	double sinphi = sin(M_PI*(1.0+xphi));
+	double sintheta = sqrt(1.0 - costheta*costheta);
+
+	double p_unit[3] = {0.0,0.0,0.0};
+	double unit_vec[3] = {cosphi*sintheta, sinphi*sintheta, costheta};
+	for(int i = 0; i < n; i++)
+	{
+		for(int k = 0; k < n; k++)
+		{
+			p_unit[i] += A[i][k]*unit_vec[k];
+		}
+		p_unit[i] += (b*(T/Tp)*Va[i] - Vq[i]*Ebar)/pbar;
+		//p_unit[i] += b*(T/Tp)*Va[i]/pbar;
+	}
+
+	// I could take out the Va part:
+	//p_unit[0] = (pbar*unit_vec[0]+bn*Va[0] + Vq[0]*sqrt((mbar*mbar + pbar*pbar*(1.0 - unit_vec[0]*unit_vec[0]))*(1.0 - Vq[0]*Vq[0]) + (pbar*unit_vec[0]+bn*Va[0])*(pbar*unit_vec[0]+bn*Va[0])))/(pbar*(1.0 - Vq[0]*Vq[0]));
+
+	//p_unit[0] = (pbar*unit_vec[0] - Vq[0]*sqrt((mbar*mbar + pbar*pbar*(1.0 - unit_vec[0]*unit_vec[0]))*(1.0 - Vq[0]*Vq[0]) + (pbar*unit_vec[0])*(pbar*unit_vec[0])))/(pbar*(1.0 - Vq[0]*Vq[0]));
+
+	double energy_unit = (mbar*mbar) / (pbar*pbar);
+	for(int i = 0; i < n; i++) energy_unit += p_unit[i] * p_unit[i];
+	energy_unit = sqrt(energy_unit);
+
+	double px_unit = p_unit[0];
+
+	double detJ = 1.0 - pbar*unit_vec[0]*Vq[0]/Ebar;  // this is very makeshift
+
+	//detJ = 1.0;
+
+	//double heat = 0.0;
+	//for(int i = 0; i < n; i++) heat += Vq[i]*unit_vec[i]*pbar;
+	//for(int i = 0; i < n; i++) heat += Vq[i]*p_unit[i]*pbar;
+
+	//double detJ = 1.0 / (1.0 + px_unit * Vq[0] / energy_unit);
+
+	double dalphaX = 0.0;
+	//for(int i = 0; i < n; i++) dalphaX += unit_vec[i]*Va[i]*pbar/Ebar;
+	//for(int i = 0; i < n; i++) dalphaX += p_unit[i]*Va[i] / energy_unit;  // this could affect renormalization of particle density
+	//for(int i = 0; i < n; i++) dalphaX += p_unit[i]*Va[i] * pbar/ Ebar;
+	//for(int i = 0; i < n; i++) dalphaX += unit_vec[i]*Va[i]/energy_unit;
+
+	// gauss laguerre (a = 2)
+	return detJ * pbar * px_unit * px_unit / energy_unit * exp(pbar) / (exp(Ebar-b*(muBp/Tp+dalphaX)) + a);
+}
+
+
+double modVx_int(double xphi, double costheta, double pbar, double **A, double * Vq, double * Va, int n, double mbar, double T, double Tp, double muBp, double b, double a)
+{
+	double Ebar = sqrt(pbar*pbar + mbar*mbar);
+
+	double cosphi = cos(M_PI*(1.0+xphi));
+	double sinphi = sin(M_PI*(1.0+xphi));
+	double sintheta = sqrt(1.0 - costheta*costheta);
+
+	double p_unit[3] = {0.0,0.0,0.0};
+	double unit_vec[3] = {cosphi*sintheta, sinphi*sintheta, costheta};
+
+	for(int i = 0; i < n; i++)
+	{
+		for(int k = 0; k < n; k++)
+		{
+			p_unit[i] += A[i][k]*unit_vec[k];
+		}
+		p_unit[i] += (b*(T/Tp)*Va[i] - Vq[i]*Ebar)/pbar;
+	}
+
+	double energy_unit = (mbar*mbar) / (pbar*pbar);
+	for(int i = 0; i < n; i++) energy_unit += p_unit[i] * p_unit[i];
+	energy_unit = sqrt(energy_unit);
+
+	double px_unit = p_unit[0];
+
+	double detJ = 1.0 - pbar*unit_vec[0]*Vq[0]/Ebar;  // this is very makeshift
+
+	double dalphaX = 0.0;
+	//for(int i = 0; i < n; i++) dalphaX += unit_vec[i]*Va[i]*pbar/Ebar;
+
+	// gauss laguerre (a = 1)
+	return detJ * b * pbar * px_unit / energy_unit * exp(pbar) / (exp(Ebar-b*(muBp/Tp+dalphaX)) + a);
+}
 
 

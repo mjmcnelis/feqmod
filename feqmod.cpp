@@ -219,11 +219,11 @@ int main()
 	double T_limit = 0.1584 * GEV_TO_INVERSE_FM;
 	double muB_limit = 1.3075 * GEV_TO_INVERSE_FM;
 
-	double sqrt_s = 5.0;                               // collision energy
+	double sqrt_s = 20.0;                                  // collision energy
 
 	// thermodynamic variables
 	double T = T_limit/(1.0+exp(2.60-log(sqrt_s)/0.45));   // temperature in fm^-1
-	double muB = muB_limit/(1.0+0.288*sqrt_s);            // baryon chemical potential in fm^-1
+	double muB = muB_limit/(1.0+0.288*sqrt_s);             // baryon chemical potential in fm^-1
 
 	double aB = muB/T;
 
@@ -318,7 +318,7 @@ int main()
 	double Tty = 0.0;
 	double Ttz = 0.0;
 
-	double Vx = 0.5 * nB / aB;
+	double Vx = 0.5 * BV;
 	double Vy = 0.0 * nB / aB;
 	double Vz = 0.0 * nB / aB;
 
@@ -402,221 +402,225 @@ int main()
 		Vq[2] = Vz * nB*T / (BV*(E+P));
 	}
 
-	// modified net baryon current
-	double factN = detA * pow(Tp,3) / (8.0*M_PI*M_PI);
-	double factV = detA * pow(Tp,3) / (8.0*M_PI*M_PI);
-	double modnB = 0.0;
-	double modVx = 0.0;
-	double modVy = 0.0;
-	double modVz = 0.0;
+	cout << "Va[0] = " << Va[0] << endl;
+	cout << "Va[0] / aB = " << Va[0] / aB << endl;
+	cout << "Vq[0] = " << Vq[0] << endl;
 
-	// modified energy momentum tensor
-	double factT = detA * pow(Tp,4) / (8.0*M_PI*M_PI);
-	double modE = 0.0;
-	double modTxx = 0.0;
-	double modTyy = 0.0;
-	double modTzz = 0.0;
-	double modTxy = 0.0;
-	double modTxz = 0.0;
-	double modTyz = 0.0;
-	double modTtx = 0.0;
-	double modTty = 0.0;
-	double modTtz = 0.0;
+	// // modified net baryon current
+	// double factN = detA * pow(Tp,3) / (8.0*M_PI*M_PI);
+	// double factV = detA * pow(Tp,3) / (8.0*M_PI*M_PI);
+	// double modnB = 0.0;
+	// double modVx = 0.0;
+	// double modVy = 0.0;
+	// double modVz = 0.0;
 
+	// // modified energy momentum tensor
+	// double factT = detA * pow(Tp,4) / (8.0*M_PI*M_PI);
+	// double modE = 0.0;
+	// double modTxx = 0.0;
+	// double modTyy = 0.0;
+	// double modTzz = 0.0;
+	// double modTxy = 0.0;
+	// double modTxz = 0.0;
+	// double modTyz = 0.0;
+	// double modTtx = 0.0;
+	// double modTty = 0.0;
+	// double modTtz = 0.0;
 
-	double renormalize[N_resonances];
 
-	double neq, N10, J20, J21;
+	// double renormalize[N_resonances];
 
-	double nlin, modn;
+	// double neq, N10, J20, J21;
 
-	double mbarp;
+	// double nlin, modn;
 
-	// renormalization for individual species
-	for(int k = 0; k < N_resonances; k++)
-	{
-		dof = (double)degeneracy[k];
-		mbar = mass[k]/T;
-		mbarp = mass[k]/Tp;
-		bk = (double)baryon[k];
-		ak = (double)sign[k];
+	// double mbarp;
 
-		neq = factnB * dof * Gauss1D(neq_int, pbar_rootN, pbar_weightN, gla_pts, mbar, T, muB, bk, ak);
-		if(baryon[k] != 0)
-		{
-			N10 = factnB * dof * Gauss1D(N10_int, pbar_rootN, pbar_weightN, gla_pts, mbar, T, muB, bk, ak);
-		}
-		else
-		{
-			N10 = 0.0;
-		}
-		J20 = factE * dof * Gauss1D(J20_int, pbar_rootT, pbar_weightT, gla_pts, mbar, T, muB, bk, ak);
-		J21 = factP * dof * Gauss1D(J21_int, pbar_rootT, pbar_weightT, gla_pts, mbar, T, muB, bk, ak);
+	// // renormalization for individual species
+	// for(int k = 0; k < N_resonances; k++)
+	// {
+	// 	dof = (double)degeneracy[k];
+	// 	mbar = mass[k]/T;
+	// 	mbarp = mass[k]/Tp;
+	// 	bk = (double)baryon[k];
+	// 	ak = (double)sign[k];
 
+	// 	neq = factnB * dof * Gauss1D(neq_int, pbar_rootN, pbar_weightN, gla_pts, mbar, T, muB, bk, ak);
+	// 	if(baryon[k] != 0)
+	// 	{
+	// 		N10 = factnB * dof * Gauss1D(N10_int, pbar_rootN, pbar_weightN, gla_pts, mbar, T, muB, bk, ak);
+	// 	}
+	// 	else
+	// 	{
+	// 		N10 = 0.0;
+	// 	}
+	// 	J20 = factE * dof * Gauss1D(J20_int, pbar_rootT, pbar_weightT, gla_pts, mbar, T, muB, bk, ak);
+	// 	J21 = factP * dof * Gauss1D(J21_int, pbar_rootT, pbar_weightT, gla_pts, mbar, T, muB, bk, ak);
 
-		// linearized akd modified particle density
-		nlin = neq + Pi/(BPi*T)*(G*N10 + F*(J20-muB*N10)/T + J21);
 
-		// neq + Pi/(BPi*T)*(F*J20/T + J21)
+	// 	// linearized akd modified particle density
+	// 	nlin = neq + Pi/(BPi*T)*(G*N10 + F*(J20-muB*N10)/T + J21);
 
-		//modn = factN * dof * GaussMod3D(modn_int, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootN, pbar_weightN, angle_pts, angle_pts, gla_pts, A, Vq, Va, n, mbarp, T, Tp, muBp, bk, ak);
+	// 	// neq + Pi/(BPi*T)*(F*J20/T + J21)
 
+	// 	modn = factN * dof * GaussMod3D(modn_int, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootN, pbar_weightN, angle_pts, angle_pts, gla_pts, A, Vq, Va, n, mbarp, T, Tp, muBp, bk, ak);
 
-		modn = 4.0 * dof * factN * Gauss1D(neq_int, pbar_rootN, pbar_weightN, gla_pts, mbarp, Tp, muBp, bk, ak);
 
-		renormalize[k] = nlin / modn;
+	// 	//modn = 4.0 * dof * factN * Gauss1D(neq_int, pbar_rootN, pbar_weightN, gla_pts, mbarp, Tp, muBp, bk, ak);
 
+	// 	renormalize[k] = nlin / modn;
 
 
-		if(nlin < 0.0)
-		{
-			printf("\nNEGATIVE LINEAR DENSITY\n");
-		}
-		if(modn < 0.0)
-		{
-			printf("\nNEGATIVE MOD DENSITY\n");
-		}
-	}
 
+	// 	if(nlin < 0.0)
+	// 	{
+	// 		printf("\nNEGATIVE LINEAR DENSITY\n");
+	// 	}
+	// 	if(modn < 0.0)
+	// 	{
+	// 		printf("\nNEGATIVE MOD DENSITY\n");
+	// 	}
+	// }
 
 
-	double Z = 0.0;  // renormalization
 
-	// Compute modification hydro outputs
-	for(int k = 0; k < N_resonances; k++)
-	{
-		dof = (double)degeneracy[k];	mbar = mass[k]/T;
-		mbarp = mass[k]/Tp;				Z = renormalize[k];
-		bk = (double)baryon[k];			ak = (double)sign[k];
+	// double Z = 0.0;  // renormalization
 
-		if(baryon[k] != 0)
-		{
-			modnB += Z * bk * dof * factN * GaussMod3D(modn_int, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootN, pbar_weightN, angle_pts, angle_pts, gla_pts, A, Vq, Va, n, mbarp, T, Tp, muBp, bk, ak);
+	// // Compute modification hydro outputs
+	// for(int k = 0; k < N_resonances; k++)
+	// {
+	// 	dof = (double)degeneracy[k];	mbar = mass[k]/T;
+	// 	mbarp = mass[k]/Tp;				Z = renormalize[k];
+	// 	bk = (double)baryon[k];			ak = (double)sign[k];
 
-			modVx += Z * dof * factV * GaussMod3D(modVx_int, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootN, pbar_weightN, angle_pts, angle_pts, gla_pts, A, Vq, Va, n, mbarp, T, Tp, muBp, bk, ak);
+	// 	if(baryon[k] != 0)
+	// 	{
+	// 		modnB += Z * bk * dof * factN * GaussMod3D(modn_int, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootN, pbar_weightN, angle_pts, angle_pts, gla_pts, A, Vq, Va, n, mbarp, T, Tp, muBp, bk, ak);
 
-			modVy += Z * dof * factV * GaussMod3D(modVy_int, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootN, pbar_weightN, angle_pts, angle_pts, gla_pts, A, Vq, Va, n, mbarp, T, Tp, muBp, bk, ak);
+	// 		modVx += Z * dof * factV * GaussMod3D(modVx_int, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootN, pbar_weightN, angle_pts, angle_pts, gla_pts, A, Vq, Va, n, mbarp, T, Tp, muBp, bk, ak);
 
-			modVz += Z * dof * factV * GaussMod3D(modVz_int, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootN, pbar_weightN, angle_pts, angle_pts, gla_pts, A, Vq, Va, n, mbarp, T, Tp, muBp, bk, ak);
-		}
+	// 		modVy += Z * dof * factV * GaussMod3D(modVy_int, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootN, pbar_weightN, angle_pts, angle_pts, gla_pts, A, Vq, Va, n, mbarp, T, Tp, muBp, bk, ak);
 
-		modE += Z * dof * factT * GaussMod3D(modE_int, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootT, pbar_weightT, angle_pts, angle_pts, gla_pts, A, Vq, Va, n, mbarp, T, Tp, muBp, bk, ak);
+	// 		modVz += Z * dof * factV * GaussMod3D(modVz_int, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootN, pbar_weightN, angle_pts, angle_pts, gla_pts, A, Vq, Va, n, mbarp, T, Tp, muBp, bk, ak);
+	// 	}
 
-		modTxx += Z * dof * factT * GaussMod3D(modTxx_int, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootT, pbar_weightT, angle_pts, angle_pts, gla_pts, A, Vq, Va, n, mbarp, T, Tp, muBp, bk, ak);
+	// 	modE += Z * dof * factT * GaussMod3D(modE_int, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootT, pbar_weightT, angle_pts, angle_pts, gla_pts, A, Vq, Va, n, mbarp, T, Tp, muBp, bk, ak);
 
-		modTyy += Z * dof * factT * GaussMod3D(modTyy_int, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootT, pbar_weightT, angle_pts, angle_pts, gla_pts, A, Vq, Va, n, mbarp, T, Tp, muBp, bk, ak);
+	// 	modTxx += Z * dof * factT * GaussMod3D(modTxx_int, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootT, pbar_weightT, angle_pts, angle_pts, gla_pts, A, Vq, Va, n, mbarp, T, Tp, muBp, bk, ak);
 
-		modTzz += Z * dof * factT * GaussMod3D(modTzz_int, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootT, pbar_weightT, angle_pts, angle_pts, gla_pts, A, Vq, Va, n, mbarp, T, Tp, muBp, bk, ak);
+	// 	modTyy += Z * dof * factT * GaussMod3D(modTyy_int, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootT, pbar_weightT, angle_pts, angle_pts, gla_pts, A, Vq, Va, n, mbarp, T, Tp, muBp, bk, ak);
 
-		modTxy += Z * dof * factT * GaussMod3D(modTxy_int, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootT, pbar_weightT, angle_pts, angle_pts, gla_pts, A, Vq, Va, n, mbarp, T, Tp, muBp, bk, ak);
+	// 	modTzz += Z * dof * factT * GaussMod3D(modTzz_int, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootT, pbar_weightT, angle_pts, angle_pts, gla_pts, A, Vq, Va, n, mbarp, T, Tp, muBp, bk, ak);
 
-		modTxz += Z * dof * factT * GaussMod3D(modTxz_int, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootT, pbar_weightT, angle_pts, angle_pts, gla_pts, A, Vq, Va, n, mbarp, T, Tp, muBp, bk, ak);
+	// 	modTxy += Z * dof * factT * GaussMod3D(modTxy_int, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootT, pbar_weightT, angle_pts, angle_pts, gla_pts, A, Vq, Va, n, mbarp, T, Tp, muBp, bk, ak);
 
-		modTyz += Z * dof * factT * GaussMod3D(modTyz_int, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootT, pbar_weightT, angle_pts, angle_pts, gla_pts, A, Vq, Va, n, mbarp, T, Tp, muBp, bk, ak);
+	// 	modTxz += Z * dof * factT * GaussMod3D(modTxz_int, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootT, pbar_weightT, angle_pts, angle_pts, gla_pts, A, Vq, Va, n, mbarp, T, Tp, muBp, bk, ak);
 
-		modTtx += Z * dof * factT * GaussMod3D(modTtx_int, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootT, pbar_weightT, angle_pts, angle_pts, gla_pts, A, Vq, Va, n, mbarp, T, Tp, muBp, bk, ak);
+	// 	modTyz += Z * dof * factT * GaussMod3D(modTyz_int, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootT, pbar_weightT, angle_pts, angle_pts, gla_pts, A, Vq, Va, n, mbarp, T, Tp, muBp, bk, ak);
 
-		modTty += Z * dof * factT * GaussMod3D(modTty_int, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootT, pbar_weightT, angle_pts, angle_pts, gla_pts, A, Vq, Va, n, mbarp, T, Tp, muBp, bk, ak);
+	// 	modTtx += Z * dof * factT * GaussMod3D(modTtx_int, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootT, pbar_weightT, angle_pts, angle_pts, gla_pts, A, Vq, Va, n, mbarp, T, Tp, muBp, bk, ak);
 
-		modTtz += Z * dof * factT * GaussMod3D(modTtz_int, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootT, pbar_weightT, angle_pts, angle_pts, gla_pts, A, Vq, Va, n, mbarp, T, Tp, muBp, bk, ak);
-	}
+	// 	modTty += Z * dof * factT * GaussMod3D(modTty_int, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootT, pbar_weightT, angle_pts, angle_pts, gla_pts, A, Vq, Va, n, mbarp, T, Tp, muBp, bk, ak);
 
+	// 	modTtz += Z * dof * factT * GaussMod3D(modTtz_int, xphi_root, xphi_weight, costheta_root, costheta_weight, pbar_rootT, pbar_weightT, angle_pts, angle_pts, gla_pts, A, Vq, Va, n, mbarp, T, Tp, muBp, bk, ak);
+	// }
 
-	double piTxx = 0.5 * (Txx - Tyy);
-	double modpiTxx = 0.5 * (modTxx - modTyy);
 
-	double bulk_in = (Txx + Tyy + Tzz)/3.0 - P;
-	double modbulk = (modTxx + modTyy + modTzz)/3.0 - P;
+	// double piTxx = 0.5 * (Txx - Tyy);
+	// double modpiTxx = 0.5 * (modTxx - modTyy);
 
+	// double bulk_in = (Txx + Tyy + Tzz)/3.0 - P;
+	// double modbulk = (modTxx + modTyy + modTzz)/3.0 - P;
 
-	//modVx += Z11 * Va[0];
-	//modTtx += nB * T * Va[0];  // add truncated V_alpha correction
 
+	// //modVx += Z11 * Va[0];
+	// //modTtx += nB * T * Va[0];  // add truncated V_alpha correction
 
-	// print input/output results for comparison
 
-	printf("\n");
+	// // print input/output results for comparison
 
-	cout << setprecision(5) << "nB       " << nB << "         " << setprecision(5) << (modnB / nB - 1.0) * 100 << " \% error" << "\n" << "modnB    " << setprecision(5) << modnB << endl;
+	// printf("\n");
 
-	printf("\n");
+	// cout << setprecision(5) << "nB       " << nB << "         " << setprecision(5) << (modnB / nB - 1.0) * 100 << " \% error" << "\n" << "modnB    " << setprecision(5) << modnB << endl;
 
-	cout << setprecision(5) << "Vx       " << Vx << "         " << setprecision(5) << (modVx / Vx - 1.0) * 100 << " \% error" << "\n" << "modVx    " << setprecision(5) << modVx << endl;
+	// printf("\n");
 
-	printf("\n");
+	// cout << setprecision(5) << "Vx       " << Vx << "         " << setprecision(5) << (modVx / Vx - 1.0) * 100 << " \% error" << "\n" << "modVx    " << setprecision(5) << modVx << endl;
 
-	cout << setprecision(5) << "Vy       " << Vy << "         " << setprecision(5) << (modVy / Vy - 1.0) * 100 << " \% error" << "\n" << "modVy    " << setprecision(5) << modVy << endl;
+	// printf("\n");
 
-	printf("\n");
+	// cout << setprecision(5) << "Vy       " << Vy << "         " << setprecision(5) << (modVy / Vy - 1.0) * 100 << " \% error" << "\n" << "modVy    " << setprecision(5) << modVy << endl;
 
-	cout << setprecision(5) << "Vz       " << Vz << "         " << setprecision(5) << (modVz / Vz - 1.0) * 100 << " \% error" << "\n" << "modVz    " << setprecision(5) << modVz << endl;
+	// printf("\n");
 
-	printf("\n");
+	// cout << setprecision(5) << "Vz       " << Vz << "         " << setprecision(5) << (modVz / Vz - 1.0) * 100 << " \% error" << "\n" << "modVz    " << setprecision(5) << modVz << endl;
 
-	cout << setprecision(5) << "Ttt       " << E << "         " << setprecision(5) << (modE / E - 1.0) * 100 << " \% error" << "\n" << "modTtt    " << setprecision(5) << modE << endl;
+	// printf("\n");
 
-	printf("\n");
+	// cout << setprecision(5) << "Ttt       " << E << "         " << setprecision(5) << (modE / E - 1.0) * 100 << " \% error" << "\n" << "modTtt    " << setprecision(5) << modE << endl;
 
-	cout << setprecision(5) << "Txx       " << Txx << "        " << setprecision(5) << (modTxx / Txx - 1.0) * 100 << " \% error" << "\n" << "modTxx    " << setprecision(5) << modTxx << endl;
+	// printf("\n");
 
-	printf("\n");
+	// cout << setprecision(5) << "Txx       " << Txx << "        " << setprecision(5) << (modTxx / Txx - 1.0) * 100 << " \% error" << "\n" << "modTxx    " << setprecision(5) << modTxx << endl;
 
-	cout << setprecision(5) << "Tyy       " << Tyy << "        " << setprecision(5) << (modTyy / Tyy - 1.0) * 100 << " \% error" << "\n" << "modTyy    " << setprecision(5) << modTyy << endl;
+	// printf("\n");
 
-	printf("\n");
+	// cout << setprecision(5) << "Tyy       " << Tyy << "        " << setprecision(5) << (modTyy / Tyy - 1.0) * 100 << " \% error" << "\n" << "modTyy    " << setprecision(5) << modTyy << endl;
 
-	cout << setprecision(5) << "Tzz       " << Tzz << "        " << setprecision(5) << (modTzz / Tzz - 1.0) * 100 << " \% error" << "\n" << "modTzz    " << setprecision(5) << modTzz << endl;
+	// printf("\n");
 
-	printf("\n");
+	// cout << setprecision(5) << "Tzz       " << Tzz << "        " << setprecision(5) << (modTzz / Tzz - 1.0) * 100 << " \% error" << "\n" << "modTzz    " << setprecision(5) << modTzz << endl;
 
-	cout << setprecision(5) << "Txy       " << Txy << "        " << setprecision(5) << (modTxy / Txy - 1.0) * 100 << " \% error" << "\n" << "modTxy    " << setprecision(5) << modTxy << endl;
+	// printf("\n");
 
-	printf("\n");
+	// cout << setprecision(5) << "Txy       " << Txy << "        " << setprecision(5) << (modTxy / Txy - 1.0) * 100 << " \% error" << "\n" << "modTxy    " << setprecision(5) << modTxy << endl;
 
-	cout << setprecision(5) << "Txz       " << Txz << "        " << setprecision(5) << (modTxz / Txz - 1.0) * 100 << " \% error" << "\n" << "modTxz    " << setprecision(5) << modTxz << endl;
+	// printf("\n");
 
-	printf("\n");
+	// cout << setprecision(5) << "Txz       " << Txz << "        " << setprecision(5) << (modTxz / Txz - 1.0) * 100 << " \% error" << "\n" << "modTxz    " << setprecision(5) << modTxz << endl;
 
-	cout << setprecision(5) << "Tyz       " << Tyz << "        " << setprecision(5) << (modTyz / Tyz - 1.0) * 100 << " \% error" << "\n" << "modTyz    " << setprecision(5) << modTyz << endl;
+	// printf("\n");
 
-	printf("\n");
+	// cout << setprecision(5) << "Tyz       " << Tyz << "        " << setprecision(5) << (modTyz / Tyz - 1.0) * 100 << " \% error" << "\n" << "modTyz    " << setprecision(5) << modTyz << endl;
 
-	cout << setprecision(5) << "Ttx       " << Ttx << "\n" << "modTtx    " << setprecision(5) << modTtx << endl;
+	// printf("\n");
 
-	printf("\n");
+	// cout << setprecision(5) << "Ttx       " << Ttx << "\n" << "modTtx    " << setprecision(5) << modTtx << endl;
 
-	cout << setprecision(5) << "Tty       " << Tty << "\n" << "modTty    " << setprecision(5) << modTty << endl;
+	// printf("\n");
 
-	printf("\n");
+	// cout << setprecision(5) << "Tty       " << Tty << "\n" << "modTty    " << setprecision(5) << modTty << endl;
 
-	cout << setprecision(5) << "Ttz       " << Ttz << "\n" << "modTtz    " << setprecision(5) << modTtz << endl;
+	// printf("\n");
 
-	printf("\n");
-	printf("\n");
-	printf("Plots:\n\n");
+	// cout << setprecision(5) << "Ttz       " << Ttz << "\n" << "modTtz    " << setprecision(5) << modTtz << endl;
 
+	// printf("\n");
+	// printf("\n");
+	// printf("Plots:\n\n");
 
-	cout << setprecision(5) << "dE/Eeq    " << setprecision(5) << (modE / E - 1.0) << endl;
 
-	printf("\n");
+	// cout << setprecision(5) << "dE/Eeq    " << setprecision(5) << (modE / E - 1.0) << endl;
 
-	//cout << setprecision(5) << "Pi/P      " << bulk_in / P  << "\n" << "modPi/P   " << setprecision(5) << modbulk / P  << endl;
+	// printf("\n");
 
-	printf("\n");
+	// //cout << setprecision(5) << "Pi/P      " << bulk_in / P  << "\n" << "modPi/P   " << setprecision(5) << modbulk / P  << endl;
 
-	//cout << setprecision(5) << "piTxx/P     " << piTxx / P  << "\n" << "modpiTxx/P   " << setprecision(5) << modpiTxx / P << endl;
+	// printf("\n");
 
-	//cout << setprecision(5) << "dTzz/Tzz      " << (modTzz - Tzz) / Tzz  << "\n" << endl;
+	// //cout << setprecision(5) << "piTxx/P     " << piTxx / P  << "\n" << "modpiTxx/P   " << setprecision(5) << modpiTxx / P << endl;
 
-	cout << setprecision(5) << "dTxx/Txx      " << (modTxx - Txx) / Txx  << "\n" << endl;
+	// //cout << setprecision(5) << "dTzz/Tzz      " << (modTzz - Tzz) / Tzz  << "\n" << endl;
 
-	cout << setprecision(5) << "modVx/(nB/aB)      " << modVx / (nB/aB)   << "\n" << endl;
+	// cout << setprecision(5) << "dTxx/Txx      " << (modTxx - Txx) / Txx  << "\n" << endl;
 
-	cout << setprecision(5) << "modTtx      " << modTtx  << "\n" << endl;
+	// cout << setprecision(5) << "modVx/(nB/aB)      " << modVx / (nB/aB)   << "\n" << endl;
 
-	printf("\n");
+	// cout << setprecision(5) << "modTtx      " << modTtx  << "\n" << endl;
 
-	printf("\n\n");
+	// printf("\n");
+
+	// printf("\n\n");
 
 
 	printf("Freeing memory...");

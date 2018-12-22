@@ -581,14 +581,14 @@ double modTxx_int(double xphi, double costheta, double pbar, double ** A, double
 
 	//double detJ = 1.0 / (1.0 + px_unit * Vq[0] / energy_unit);
 
-	double dalphaX = 0.0;
+	//double dalphaX = 0.0;
 	//for(int i = 0; i < n; i++) dalphaX += unit_vec[i]*Va[i]*pbar/Ebar;
 	//for(int i = 0; i < n; i++) dalphaX += p_unit[i]*Va[i] / energy_unit;  // this could affect renormalization of particle density
 	//for(int i = 0; i < n; i++) dalphaX += p_unit[i]*Va[i] * pbar/ Ebar;
 	//for(int i = 0; i < n; i++) dalphaX += unit_vec[i]*Va[i]/energy_unit;
 
 	// gauss laguerre (a = 2)
-	return detJ * pbar * px_unit * px_unit / energy_unit * exp(pbar) / (exp(Ebar-b*(muBp/Tp+dalphaX)) + a);
+	return detJ * pbar * px_unit * px_unit / energy_unit * exp(pbar) / (exp(Ebar-b*muBp/Tp) + a);
 }
 
 
